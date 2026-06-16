@@ -45,7 +45,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('/event/add', [EventController::class, 'createForm'])->name('admin.event.add');
     Route::post('/event/submit', [EventController::class, 'store'])->name('admin.event.store');
     
-    Route::get('/event/edit/{id}', [EventController::class, 'editForm'])->name('admin.event.edit');
+    Route::get('/event/edit/{id}', [EventController::class, 'editEvent'])->name('admin.event.edit');
     Route::put('/event/update/{id}', [EventController::class, 'updateSubmit'])->name('admin.event.update');
     
     // Deleting an event (Using GET method as taught in your class)
