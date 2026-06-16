@@ -51,16 +51,16 @@ Route::group(['prefix' => 'admin'], function () {
     // Deleting an event (Using GET method as taught in your class)
     Route::get('/event/delete/{id}', [EventController::class, 'delete'])->name('admin.event.delete');
 
-    // Ticketing & Attendance Check-in [cite: 34]
+    // Ticketing & Attendance Check-in 
     Route::get('/checkin/{event_id}', [AttendanceController::class, 'scannerPage'])->name('admin.scanner');
     Route::post('/checkin/scan', [AttendanceController::class, 'scanQrCode'])->name('admin.scan.submit'); 
     Route::post('/checkin/manual', [AttendanceController::class, 'manualCheckIn'])->name('admin.manual.submit');
 
-    // Comprehensive Event Reports [cite: 39]
+    // Comprehensive Event Reports 
     Route::get('/report/{event_id}', [EventController::class, 'reportYield'])->name('admin.report'); 
     Route::get('/export/{event_id}', [EventController::class, 'exportManifest'])->name('admin.export');
     
-    // E-Certificates (Value-Add Feature) [cite: 46]
+    // E-Certificates (Value-Add Feature)
     Route::get('/certificates/send/{event_id}', [EventController::class, 'issueCertificates'])->name('admin.certificates.send');
 });
 
