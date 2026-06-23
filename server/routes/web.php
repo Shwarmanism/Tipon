@@ -19,7 +19,8 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 /* Role A: Normal User (Student / Attendee) */
 Route::group(['prefix' => 'student'], function () {
-    
+
+
     // Ticket Wallet & QR Access
     Route::get('/tickets', [TicketController::class, 'list'])->name('student.tickets');
     Route::get('/ticket/{id}', [TicketController::class, 'showQR'])->name('student.ticket.view');
