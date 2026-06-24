@@ -13,6 +13,7 @@ Route::get('/event/{id}', [EventController::class, 'show'])->name('event.show');
 
 Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'loginSubmit'])->name('login.submit');
+
 Route::get('/register', [AuthController::class, 'registerForm'])->name('register');
 Route::post('/register', [AuthController::class, 'registerSubmit'])->name('register.submit');
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
