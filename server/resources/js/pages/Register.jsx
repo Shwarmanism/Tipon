@@ -7,16 +7,17 @@ export default function Register() {
         <AuthLayout>
 
             <div className="
-                w-[600px] min-h[750px]
+                w-full 
+                max-w-[620px]
                 bg-white
                 rounded-3xl
-                p-10
+                p-6 md:p-8 lg:p-10
                 shadow-xl
                 border
                 border-orange-200
             ">
 
-                <h1 className="text-4xl font-bold text-orange-600 text-center">
+                <h1 className="text-3xl md:text-4xl font-bold text-orange-600 text-center">
                     Create your account
                 </h1>
 

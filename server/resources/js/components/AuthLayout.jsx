@@ -3,21 +3,40 @@ import illustration from "../assets/images/illustration.png";
 
 export default function AuthLayout({ children }) {
     return (
-        <div className="min-h-screen flex bg-white">
+        <div className="min-h-screen flex flex-col lg:flex-row bg-white">
 
             {/* LEFT PANEL */}
-            <div className="w-[55%] bg-[#FFF4EC] rounded-r-[50px] flex flex-col items-center justify-center px-10">
+            <div className="
+                            hidden
+                            2xl:flex
+                            2xl:w-[55%]
+                            bg-[#FFF4EC]
+                            rounded-r-[50px]
+                            flex-col
+                            items-center
+                            justify-center
+                            px-10
+                        ">
 
                 <img
                     src={logo}
                     alt="Tipon Logo"
-                    className="h-24 w-auto mb-8"
+                    className=" 
+                                h-16
+                                md:h-20
+                                lg:h-24
+                                mb-8"
                 />
 
                 <img
                     src={illustration}
                     alt="Community Illustration"
-                    className="w-[600px] h-auto object-contain"
+                    className="
+                            hidden
+                            lg:block
+                            w-[500px]
+                            h-auto
+                            object-contain"
                 />
 
                 <div className="mt-6 text-center">
@@ -33,7 +52,13 @@ export default function AuthLayout({ children }) {
             </div>
 
             {/* RIGHT PANEL */}
-            <div className="w-[45%] flex items-center justify-center">
+            <div className="flex 
+                            2xl:w-[45%]
+                            justify-center 
+                            items-center
+                            w-full 
+                            min-h-screen 
+                            ">
                 {children}
             </div>
 
