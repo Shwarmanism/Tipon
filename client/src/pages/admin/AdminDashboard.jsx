@@ -3,9 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import './admin.css';
 
 // ─── Mock Data (replace with real API responses) ──────────────────────────────
-// These mirror the shape of what Laravel should return.
-// You need to hit the endpoints and set state with the response.
-
 const MOCK_STATS = [
   { label: 'Total Active Events', value: 0 },
   { label: 'Total Registrations', value: 0 },
@@ -21,15 +18,49 @@ const MOCK_EVENTS = [
     venue: 'PUP Gymnasium',
     registrations: '42/50',
     registrationPercent: 84,
-    status: 'published', // must match CSS: 'published' | 'draft' | 'cancelled'
+    status: 'published',
   },
 ];
 // ─────────────────────────────────────────────────────────────────────────────
+
+function DeleteModal({ event, onConfirm, onCancel }) {
+  if (!event) return null;
+  return (
+    <div className="modal-backdrop-custom" onClick={onCancel}>
+      <div
+        className="modal-box-custom"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-modal-title"
+      >
+        <div className="modal-icon-wrap danger">
+          <i className="bi bi-trash3"></i>
+        </div>
+        <h5 className="modal-box-title" id="delete-modal-title">Delete Event</h5>
+        <p className="modal-box-body">
+          Are you sure you want to delete{' '}
+          <strong>&ldquo;{event.title}&rdquo;</strong>?
+          This action cannot be undone.
+        </p>
+        <div className="modal-box-actions">
+          <button className="btn btn-modal-cancel" onClick={onCancel}>
+            Cancel
+          </button>
+          <button className="btn btn-modal-danger" onClick={onConfirm}>
+            <i className="bi bi-trash3 me-1"></i> Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function AdminDashboard() {
   const [stats, setStats] = useState(MOCK_STATS);
   const [events, setEvents] = useState(MOCK_EVENTS);
   const [loading, setLoading] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -43,12 +74,10 @@ function AdminDashboard() {
       const res = await fetch('http://127.0.0.1:8000/api/admin/dashboard', {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json'
-        }
+          'Accept': 'application/json',
+        },
       });
-      
       if (!res.ok) throw new Error('Failed to fetch dashboard data');
-      
       const data = await res.json();
       setStats(data.stats);
       setEvents(data.events);
@@ -71,26 +100,36 @@ function AdminDashboard() {
     navigate(`/admin/events/${eventId}/edit`);
   }
 
-  async function handleDelete(eventId) {
-    if (!window.confirm('Are you sure you want to delete this event?')) return;
+  function handleDeleteClick(event) {
+    setEventToDelete(event);
+  }
+
+  async function handleDeleteConfirm() {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://127.0.0.1:8000/api/admin/event/delete/${eventId}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const res = await fetch(
+        `http://127.0.0.1:8000/api/admin/event/delete/${eventToDelete.id}`,
+        {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` },
+        }
+      );
       if (!res.ok) throw new Error('Failed to delete event');
+      setEventToDelete(null);
       fetchDashboardData();
     } catch (error) {
       console.error('Delete error:', error);
     }
   }
 
+  function handleDeleteCancel() {
+    setEventToDelete(null);
+  }
+
   function handleCreateEvent() {
     navigate('/admin/events/create');
   }
 
-  // ─── Status label display (matches CSS class names) ─────────────────────────
   const STATUS_LABELS = {
     published: 'Published',
     draft: 'Draft',
@@ -99,6 +138,13 @@ function AdminDashboard() {
 
   return (
     <div className="admin-content">
+      {/* Delete confirmation modal */}
+      <DeleteModal
+        event={eventToDelete}
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+      />
+
       {/* Header */}
       <div className="d-flex justify-content-between align-items-start mb-4">
         <div>
@@ -211,7 +257,7 @@ function AdminDashboard() {
                       </button>
                       <button
                         className="btn btn-action-delete"
-                        onClick={() => handleDelete(event.id)}
+                        onClick={() => handleDeleteClick(event)}
                       >
                         <i className="bi bi-trash"></i>
                       </button>

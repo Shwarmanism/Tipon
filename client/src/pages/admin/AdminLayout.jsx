@@ -57,6 +57,17 @@ function AdminLayout() {
             <i className="bi bi-calendar-event me-2"></i>
             Events
           </NavLink>
+
+          <p className="sidebar-section-label mt-3">ACCOUNT</p>
+          <NavLink
+            to="/admin/profile"
+            className={({ isActive }) =>
+              'sidebar-link' + (isActive ? ' active' : '')
+            }
+          >
+            <i className="bi bi-person me-2"></i>
+            Profile
+          </NavLink>
         </nav>
 
         {/* Bottom user info */}
