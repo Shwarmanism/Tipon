@@ -37,32 +37,41 @@ export default function Login() {
 
     setSubmitting(true);
     try {
-      // TODO (backend): POST to Laravel login endpoint
-      //
-      // const res = await fetch('/api/login', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'Accept': 'application/json',
-      //   },
-      //   body: JSON.stringify({
-      //     email:    form.email,
-      //     password: form.password,
-      //   }),
-      // });
-      // if (!res.ok) {
-      //   const data = await res.json();
-      //   setErrors(data.errors ?? { email: 'Invalid credentials.' });
-      //   return;
-      // }
-      // const data = await res.json();
-      // localStorage.setItem('token', data.token);
-      // navigate('/admin/dashboard');
+      // Point directly to the Laravel local server
+      const res = await fetch('http://127.0.0.1:8000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          email:    form.email,
+          password: form.password,
+        }),
+      });
 
-      console.log('Login:', form);
-      navigate('/admin/dashboard');
+      if (!res.ok) {
+        const data = await res.json();
+        // Catch the specific error structure we built in Laravel
+        setErrors(data.errors || { email: 'Invalid credentials.' });
+        return;
+      }
+
+      const data = await res.json();
+      
+      // Store the token in the browser so you can use it for future API calls
+      localStorage.setItem('token', data.token);
+      
+      // Check the user role to route them to the correct dashboard
+      if (data.user.role === 'admin') {
+          navigate('/admin/dashboard');
+      } else {
+          navigate('/'); // Student Bulletin Board
+      }
+
     } catch (error) {
       console.error('Login failed:', error);
+      setErrors({ email: 'Server connection failed. Is Laravel running?' });
     } finally {
       setSubmitting(false);
     }

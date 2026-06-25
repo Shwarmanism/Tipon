@@ -36,34 +36,7 @@ Route::group(['prefix' => 'student'], function () {
     Route::post('/feedback/submit', [EventController::class, 'feedbackSubmit'])->name('student.feedback.submit');
 });
 
- /* Role B: Admin (Organization Officer) */
-Route::group(['prefix' => 'admin'], function () {
 
-    // Dashboard Analytics (Active events, real-time capacity)
-    Route::get('/dashboard', [EventController::class, 'dashboard'])->name('admin.dashboard');
-
-    // Event Lifecycle Management (Full CRUD)
-    Route::get('/event/add', [EventController::class, 'createForm'])->name('admin.event.add');
-    Route::post('/event/submit', [EventController::class, 'store'])->name('admin.event.store');
-    
-    Route::get('/event/edit/{id}', [EventController::class, 'editEvent'])->name('admin.event.edit');
-    Route::put('/event/update/{id}', [EventController::class, 'updateSubmit'])->name('admin.event.update');
-    
-    // Deleting an event (Using GET method as taught in your class)
-    Route::get('/event/delete/{id}', [EventController::class, 'delete'])->name('admin.event.delete');
-
-    // Ticketing & Attendance Check-in 
-    Route::get('/checkin/{event_id}', [AttendanceController::class, 'scannerPage'])->name('admin.scanner');
-    Route::post('/checkin/scan', [AttendanceController::class, 'scanQrCode'])->name('admin.scan.submit'); 
-    Route::post('/checkin/manual', [AttendanceController::class, 'manualCheckIn'])->name('admin.manual.submit');
-
-    // Comprehensive Event Reports 
-    Route::get('/report/{event_id}', [EventController::class, 'reportYield'])->name('admin.report'); 
-    Route::get('/export/{event_id}', [EventController::class, 'exportManifest'])->name('admin.export');
-    
-    // E-Certificates (Value-Add Feature)
-    Route::get('/certificates/send/{event_id}', [EventController::class, 'issueCertificates'])->name('admin.certificates.send');
-});
 
 /*Fallback Route*/
 Route::fallback([FallbackController::class, 'endpoint']);

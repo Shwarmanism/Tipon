@@ -29,12 +29,69 @@ class EventController extends Controller
 
     public function dashboard()
     {
-        $events = DB::table('events')
-                    ->where('creator_id', Auth::id())
-                    ->orderBy('event_date', 'asc')
-                    ->get();
+        $userId = Auth::id();
 
-        return view('admin.dashboard', compact('events'));
+        // Get all events created by the logged-in admin
+        $eventsQuery = DB::table('events')->where('creator_id', $userId);
+        
+        $totalActiveEvents = $eventsQuery->where('event_date', '>=', now()->toDateString())->count();
+        
+        // Let's get total registrations across all their events
+        $totalRegistrations = DB::table('tickets')
+            ->join('events', 'tickets.event_id', '=', 'events.id')
+            ->where('events.creator_id', $userId)
+            ->where('tickets.status', 'active')
+            ->count();
+            
+        // Let's get total attendees checked in
+        $totalCheckedIn = DB::table('attendances')
+            ->join('tickets', 'attendances.ticket_id', '=', 'tickets.id')
+            ->join('events', 'tickets.event_id', '=', 'events.id')
+            ->where('events.creator_id', $userId)
+            ->count();
+
+        $stats = [
+            ['label' => 'Total Active Events', 'value' => $totalActiveEvents],
+            ['label' => 'Total Registrations', 'value' => $totalRegistrations],
+            ['label' => 'Total Attendees Checked In', 'value' => $totalCheckedIn],
+        ];
+
+        $eventsData = DB::table('events')
+            ->where('creator_id', $userId)
+            ->orderBy('event_date', 'asc')
+            ->get();
+
+        $formattedEvents = $eventsData->map(function ($event) {
+            // Count active tickets for this event
+            $registeredCount = DB::table('tickets')
+                ->where('event_id', $event->id)
+                ->where('status', 'active')
+                ->count();
+                
+            $percent = $event->total_slots > 0 ? round(($registeredCount / $event->total_slots) * 100) : 0;
+            
+            // Determine status based on event_date
+            $status = 'published';
+            if (\Carbon\Carbon::parse($event->event_date)->isPast()) {
+                $status = 'cancelled'; // Re-using cancelled for past events, or could add 'completed' if CSS supports it
+            }
+
+            return [
+                'id' => $event->id,
+                'title' => $event->title,
+                'category' => $event->category,
+                'date' => \Carbon\Carbon::parse($event->event_date)->format('M d, Y'),
+                'venue' => $event->venue,
+                'registrations' => "{$registeredCount}/{$event->total_slots}",
+                'registrationPercent' => $percent,
+                'status' => $status,
+            ];
+        });
+
+        return response()->json([
+            'stats' => $stats,
+            'events' => $formattedEvents,
+        ]);
     }
 
     public function createForm()
@@ -49,36 +106,45 @@ class EventController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'category' => 'required|string',
+            'target_audience' => 'required|string',
             'event_date' => 'required|date',
             'start_time' => 'required',
             'end_time' => 'required',
             'venue' => 'required|string',
             'total_slots' => 'required|integer|min:1',
+            'status' => 'required|string|in:draft,published',
         ]);
 
         // 2. Insert into the database using Query Builder
-        DB::table('events')->insert([
+        $eventId = DB::table('events')->insertGetId([
             'creator_id' => Auth::id(),
             'title' => $request->title,
             'description' => $request->description,
             'category' => $request->category,
+            'target_audience' => $request->target_audience,
             'event_date' => $request->event_date,
             'start_time' => $request->start_time,
             'end_time' => $request->end_time,
             'venue' => $request->venue,
             'total_slots' => $request->total_slots,
+            'status' => $request->status,
             'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
-        return redirect()->route('admin.dashboard')->with('success', 'Event successfully published!');
+        return response()->json([
+            'success' => true,
+            'message' => 'Event successfully ' . ($request->status === 'published' ? 'published!' : 'saved as draft.'),
+            'event_id' => $eventId
+        ], 201);
     }
 
     public function editEvent($id)
     {
         $event = DB::table('events')->where('id', $id)->first();
-        if (!$event) abort(404);
+        if (!$event) return response()->json(['error' => 'Event not found'], 404);
 
-        return view('admin.events.edit', compact('event'));
+        return response()->json(['event' => $event]);
     }
 
     public function updateSubmit(Request $request, $id)
@@ -87,40 +153,44 @@ class EventController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'category' => 'required|string',
+            'target_audience' => 'required|string',
             'event_date' => 'required|date',
             'start_time' => 'required',
             'end_time' => 'required',
             'venue' => 'required|string',
             'total_slots' => 'required|integer|min:1',
+            'status' => 'required|string|in:draft,published',
         ]);
 
         DB::table('events')->where('id', $id)->update([
             'title' => $request->title,
             'description' => $request->description,
             'category' => $request->category,
+            'target_audience' => $request->target_audience,
             'event_date' => $request->event_date,
             'start_time' => $request->start_time,
             'end_time' => $request->end_time,
             'venue' => $request->venue,
             'total_slots' => $request->total_slots,
+            'status' => $request->status,
             'updated_at' => now(),
         ]);
 
-        return redirect()->route('admin.dashboard')->with('success', 'Event updated successfully!');
+        return response()->json(['success' => true, 'message' => 'Event updated successfully!']);
     }
 
     public function delete($id)
     {
         DB::table('events')->where('id', $id)->delete();
 
-        return redirect()->route('admin.dashboard')->with('success', 'Event deleted successfully.');
+        return response()->json(['success' => true, 'message' => 'Event deleted successfully.']);
     }
 
 
     public function reportYield($event_id)
     {
         $event = DB::table('events')->where('id', $event_id)->first();
-        if (!$event) abort(404);
+        if (!$event) return response()->json(['error' => 'Event not found'], 404);
 
 
         $totalRegistered = DB::table('tickets')
@@ -133,7 +203,11 @@ class EventController extends Controller
                            ->where('tickets.event_id', $event_id)
                            ->count();
 
-        return view('admin.events.report', compact('event', 'totalRegistered', 'totalAttended'));
+        return response()->json([
+            'event' => $event,
+            'totalRegistered' => $totalRegistered,
+            'totalAttended' => $totalAttended
+        ]);
     }
 
     public function exportManifest($event_id)
