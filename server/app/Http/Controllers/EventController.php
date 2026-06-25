@@ -203,10 +203,32 @@ class EventController extends Controller
                            ->where('tickets.event_id', $event_id)
                            ->count();
 
+        $manifest = DB::table('tickets')
+            ->join('users', 'tickets.user_id', '=', 'users.id')
+            ->leftJoin('attendances', 'tickets.id', '=', 'attendances.ticket_id')
+            ->where('tickets.event_id', $event_id)
+            ->where('tickets.status', 'active')
+            ->select(
+                'users.name',
+                'users.email',
+                'attendances.check_in_time'
+            )
+            ->get()
+            ->map(function($record, $index) {
+                return [
+                    'no' => $index + 1,
+                    'name' => $record->name,
+                    'email' => $record->email,
+                    'checkInTime' => $record->check_in_time ? \Carbon\Carbon::parse($record->check_in_time)->format('g:i a') : '—',
+                    'status' => $record->check_in_time ? 'attended' : 'absent'
+                ];
+            });
+
         return response()->json([
             'event' => $event,
             'totalRegistered' => $totalRegistered,
-            'totalAttended' => $totalAttended
+            'totalAttended' => $totalAttended,
+            'manifest' => $manifest
         ]);
     }
 

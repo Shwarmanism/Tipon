@@ -89,9 +89,9 @@ function EventReport() {
         { name: 'Did Not Show', value: noShows },
       ]);
 
-      // Using mock for these until backend provides them
+      // Using mock for this chart until backend provides them
       setBarData(MOCK_BAR_DATA);
-      setManifest(MOCK_MANIFEST);
+      setManifest(data.manifest || []);
     } catch (error) {
       console.error('Failed to fetch report:', error);
     } finally {
