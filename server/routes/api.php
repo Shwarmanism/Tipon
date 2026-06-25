@@ -34,6 +34,11 @@ Route::middleware('auth:sanctum')->group(function () {
         // Dashboard Analytics
         Route::get('/dashboard', [EventController::class, 'dashboard']);
 
+        // Profile Endpoints
+        Route::get('/profile', [AuthController::class, 'getProfile']);
+        Route::post('/profile/update', [AuthController::class, 'updateProfile']);
+        Route::put('/profile/password', [AuthController::class, 'updatePassword']);
+
         // Event Lifecycle Management
         Route::get('/event/add', [EventController::class, 'createForm']);
         Route::post('/event/submit', [EventController::class, 'store']);

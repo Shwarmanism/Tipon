@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './auth.css';
+import logo from '../../assets/images/logo.png';
 
 const EMPTY_FORM = {
   email:    '',
@@ -82,7 +83,7 @@ export default function Login() {
 
       {/* Logo */}
       <div className="text-center mb-4">
-        <span className="logo-text" style={{ fontSize: '2rem' }}>Tipon</span>
+        <img src={logo} alt="Tipon" className="auth-logo" />
       </div>
 
       <h1 className="auth-title">Welcome Back</h1>

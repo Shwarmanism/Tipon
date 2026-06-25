@@ -85,6 +85,7 @@ class EventController extends Controller
                 'registrations' => "{$registeredCount}/{$event->total_slots}",
                 'registrationPercent' => $percent,
                 'status' => $status,
+                'posterUrl' => $event->poster_path ? asset('storage/' . $event->poster_path) : null,
             ];
         });
 
@@ -128,6 +129,7 @@ class EventController extends Controller
             'venue' => $request->venue,
             'total_slots' => $request->total_slots,
             'status' => $request->status,
+            'poster_path' => $request->hasFile('poster') ? $request->file('poster')->store('posters', 'public') : null,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -162,7 +164,7 @@ class EventController extends Controller
             'status' => 'required|string|in:draft,published',
         ]);
 
-        DB::table('events')->where('id', $id)->update([
+        $dataToUpdate = [
             'title' => $request->title,
             'description' => $request->description,
             'category' => $request->category,
@@ -174,7 +176,13 @@ class EventController extends Controller
             'total_slots' => $request->total_slots,
             'status' => $request->status,
             'updated_at' => now(),
-        ]);
+        ];
+
+        if ($request->hasFile('poster')) {
+            $dataToUpdate['poster_path'] = $request->file('poster')->store('posters', 'public');
+        }
+
+        DB::table('events')->where('id', $id)->update($dataToUpdate);
 
         return response()->json(['success' => true, 'message' => 'Event updated successfully!']);
     }
@@ -203,10 +211,32 @@ class EventController extends Controller
                            ->where('tickets.event_id', $event_id)
                            ->count();
 
+        $manifest = DB::table('tickets')
+            ->join('users', 'tickets.user_id', '=', 'users.id')
+            ->leftJoin('attendances', 'tickets.id', '=', 'attendances.ticket_id')
+            ->where('tickets.event_id', $event_id)
+            ->where('tickets.status', 'active')
+            ->select(
+                'users.name',
+                'users.email',
+                'attendances.check_in_time'
+            )
+            ->get()
+            ->map(function($record, $index) {
+                return [
+                    'no' => $index + 1,
+                    'name' => $record->name,
+                    'email' => $record->email,
+                    'checkInTime' => $record->check_in_time ? \Carbon\Carbon::parse($record->check_in_time)->format('g:i a') : '—',
+                    'status' => $record->check_in_time ? 'attended' : 'absent'
+                ];
+            });
+
         return response()->json([
             'event' => $event,
             'totalRegistered' => $totalRegistered,
-            'totalAttended' => $totalAttended
+            'totalAttended' => $totalAttended,
+            'manifest' => $manifest
         ]);
     }
 
@@ -248,9 +278,11 @@ class EventController extends Controller
                 ->first();
 
             $status = 'available';
+            $ticketCode = null;
             if ($userTicket) {
                 if ($userTicket->status === 'active') {
                     $status = 'registered';
+                    $ticketCode = 'TK - ' . str_pad($userTicket->id, 3, '0', STR_PAD_LEFT);
                 } elseif ($userTicket->status === 'waitlisted') {
                     $status = 'waitlisted'; // or custom
                 }
@@ -268,9 +300,10 @@ class EventController extends Controller
                 'venue' => $event->venue,
                 'totalSlots' => $event->total_slots,
                 'registeredCount' => $registeredCount,
-                'posterUrl' => null, // TODO: Use poster_path when available
+                'posterUrl' => $event->poster_path ? asset('storage/' . $event->poster_path) : null,
                 'status' => $status,
                 'slotsLeft' => $slotsLeft > 0 ? $slotsLeft : 0,
+                'ticketCode' => $ticketCode,
             ];
         });
 
@@ -315,7 +348,7 @@ class EventController extends Controller
             'targetAudience' => $event->target_audience,
             'totalSlots' => $event->total_slots,
             'registeredCount' => $registeredCount,
-            'posterUrl' => null,
+            'posterUrl' => $event->poster_path ? asset('storage/' . $event->poster_path) : null,
             'status' => $status,
             'slotsLeft' => $slotsLeft > 0 ? $slotsLeft : 0,
         ]);

@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import './user.css';
+import logo from '../../assets/images/logo.png';
 
 function UserLayout() {
   const navigate = useNavigate();
@@ -16,6 +17,24 @@ function UserLayout() {
     }
   }
 
+  async function handleLogout() {
+    const token = localStorage.getItem('token');
+    try {
+      await fetch('http://127.0.0.1:8000/api/logout', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+        },
+      });
+    } catch (err) {
+      console.error('Logout request failed:', err);
+    } finally {
+      localStorage.removeItem('token');
+      navigate('/login');
+    }
+  }
+
   return (
     <div className="user-page">
 
@@ -25,8 +44,7 @@ function UserLayout() {
 
           {/* Logo */}
           <div className="user-navbar-logo">
-            <div className="logo-placeholder"></div>
-            <span className="logo-text">Tipon</span>
+            <img src={logo} alt="Tipon" className="user-navbar-logo-img" />
           </div>
 
           {/* Nav links */}
@@ -69,6 +87,16 @@ function UserLayout() {
             />
             <i className="bi bi-sliders user-search-icon"></i>
           </div>
+
+          {/* Logout */}
+          <button
+            className="btn user-logout-btn"
+            onClick={handleLogout}
+            title="Logout"
+          >
+            <i className="bi bi-box-arrow-right"></i>
+            <span>Logout</span>
+          </button>
 
         </div>
       </nav>

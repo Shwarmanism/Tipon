@@ -2,7 +2,7 @@
 .admin-wrapper {
   display: flex;
   min-height: 100vh;
-  background-color: #faf9f7;
+  background-color: #FFFCFA;
 }
 
 .admin-main {
@@ -22,7 +22,7 @@
   width: 240px;
   min-width: 240px;
   background-color: #ffffff;
-  border-right: 1px solid #eeebe6;
+  border-right: 1px solid #d8e3dc;
   display: flex;
   flex-direction: column;
   padding: 1.25rem 0;
@@ -30,17 +30,15 @@
 
 .sidebar-logo {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0 1.25rem 1rem;
+  align-items: left;
+  justify-content: center;
+  padding: 1rem 1.25rem;
 }
 
-.logo-placeholder {
-  width: 36px;
-  height: 36px;
-  background-color: #e0ddd8;
-  border-radius: 6px;
-  flex-shrink: 0;
+.sidebar-logo-img {
+  width: 200px;
+  height: auto;
+  object-fit: contain;
 }
 
 .logo-text {
@@ -83,12 +81,12 @@
 }
 
 .sidebar-link:hover {
-  background-color: #fdf0e8;
+  background-color: #EAF8F0;
   color: #e8611a;
 }
 
 .sidebar-link.active {
-  background-color: #fdf0e8;
+  background-color: #EAF8F0;
   color: #e8611a;
   font-weight: 600;
 }
@@ -129,7 +127,7 @@
 
 .user-role {
   font-size: 0.72rem;
-  color: #999;
+  color: #6B8074;
 }
 
 .sidebar-user-menu {
@@ -141,16 +139,51 @@
   color: #555;
 }
 
+.sidebar-user-wrapper {
+  position: relative;
+}
+
+.sidebar-user-dropdown {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 0;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, .10);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .12);
+  min-width: 140px;
+  z-index: 200;
+  overflow: hidden;
+}
+
+.sidebar-user-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  font-size: .875rem;
+  color: #dc3545;
+  cursor: pointer;
+  transition: background .15s;
+}
+
+.sidebar-user-dropdown-item:hover {
+  background: #fff5f5;
+}
+
 /* ─── Page Header ─────────────────────────────────────── */
 .admin-page-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #5C4A42;
 }
 
 .admin-page-subtitle {
   font-size: 0.875rem;
-  color: #999;
+  color: #6B8074;
 }
 
 /* ─── Create Event Button ─────────────────────────────── */
@@ -193,7 +226,7 @@
 .stat-value {
   font-size: 2rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #5C4A42;
   margin: 0.5rem 0 0.25rem;
 }
 
@@ -242,7 +275,7 @@
 
 .event-title-cell {
   font-weight: 500;
-  color: #1a1a1a;
+  color: #5C4A42;
   max-width: 180px;
 }
 
@@ -459,7 +492,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #999;
+  color: #6B8074;
   font-size: 0.875rem;
 }
 
@@ -624,7 +657,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  color: #999;
+  color: #6B8074;
   font-size: 0.875rem;
 }
 
@@ -741,7 +774,7 @@
 
 .report-chart-title {
   font-size: 0.82rem;
-  color: #888;
+  color: #6B8074;
   margin-bottom: 1rem;
 }
 
@@ -759,4 +792,183 @@
   justify-content: center;
   color: #bbb;
   font-size: 0.875rem;
+}
+
+/* ─── Admin Events Grid ────────────────────────────────── */
+.admin-events-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 992px) {
+  .admin-events-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.admin-event-card {
+  background: #fff;
+  border: 1px solid #eeebe6;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.admin-event-card:hover {
+  box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+}
+
+.admin-event-card-poster {
+  position: relative;
+  height: 160px;
+  background: #f0ede8;
+  overflow: hidden;
+}
+
+.admin-event-card-poster-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-event-card-poster-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #e8611a 0%, #f4a261 100%);
+  opacity: 0.85;
+}
+
+.admin-event-card-body {
+  padding: 1rem 1.25rem;
+}
+
+.admin-event-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 0.4rem;
+}
+
+.admin-event-card-meta {
+  font-size: 0.8rem;
+  color: #6B8074;
+  margin-bottom: 0.2rem;
+}
+
+/* ─── Admin Profile ───────────────────────── */
+.admin-profile-page {
+  padding: 2rem;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.admin-page-header {
+  margin-bottom: 1.5rem;
+}
+
+.admin-page-title {
+  font-weight: 700;
+  margin-bottom: .25rem;
+}
+
+.admin-page-subtitle {
+  color: #6c757d;
+  font-size: .9rem;
+  margin: 0;
+}
+
+.admin-avatar {
+  /* override user avatar color with your admin primary if needed */
+  background-color: var(--admin-primary, #e74c3c);
+}
+
+.admin-role-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: .75rem;
+  color: #6c757d;
+  margin-top: .25rem;
+}
+
+/* ── Delete confirmation modal ─────────────────────────────────────────── */
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+
+.modal-box-custom {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, .18);
+  text-align: center;
+}
+
+.modal-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin: 0 auto 1rem;
+}
+
+.modal-icon-wrap.danger {
+  background: #fff0f0;
+  color: #dc3545;
+}
+
+.modal-box-title {
+  font-weight: 700;
+  margin-bottom: .5rem;
+}
+
+.modal-box-body {
+  font-size: .9rem;
+  color: #6c757d;
+  margin-bottom: 1.5rem;
+}
+
+.modal-box-actions {
+  display: flex;
+  gap: .75rem;
+  justify-content: center;
+}
+
+.btn-modal-cancel {
+  flex: 1;
+  border: 1px solid #dee2e6;
+  background: #fff;
+  color: #495057;
+  border-radius: 6px;
+  padding: .5rem 1rem;
+  transition: background .15s;
+}
+
+.btn-modal-cancel:hover {
+  background: #f8f9fa;
+}
+
+.btn-modal-danger {
+  flex: 1;
+  background: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: .5rem 1rem;
+  transition: background .15s;
+}
+
+.btn-modal-danger:hover {
+  background: #bb2d3b;
 }
