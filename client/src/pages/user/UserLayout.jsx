@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import './user.css';
+import logo from '../../assets/images/logo.png';
 
 function UserLayout() {
   const navigate = useNavigate();
@@ -43,8 +44,7 @@ function UserLayout() {
 
           {/* Logo */}
           <div className="user-navbar-logo">
-            <div className="logo-placeholder"></div>
-            <span className="logo-text">Tipon</span>
+            <img src={logo} alt="Tipon" className="user-navbar-logo-img" />
           </div>
 
           {/* Nav links */}

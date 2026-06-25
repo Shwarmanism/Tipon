@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import logo from '../../assets/images/logo.png';
 import './admin.css';
 
 function AdminLayout() {
@@ -30,8 +31,7 @@ function AdminLayout() {
       <aside className="admin-sidebar">
         {/* Logo */}
         <div className="sidebar-logo">
-          <div className="logo-placeholder"></div>
-          <span className="logo-text">Tipon</span>
+          <img src={logo} alt="Tipon" className="sidebar-logo-img" />
         </div>
 
         <hr className="sidebar-divider" />

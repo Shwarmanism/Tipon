@@ -28,9 +28,9 @@
 }
 
 .auth-logo {
-  height: 96px;
+  height: 60px;
   width: auto;
-  margin-bottom: 2rem;
+  object-fit: contain;
 }
 
 .auth-illustration {

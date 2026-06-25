@@ -30,17 +30,15 @@
 
 .sidebar-logo {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0 1.25rem 1rem;
+  align-items: left;
+  justify-content: center;
+  padding: 1rem 1.25rem;
 }
 
-.logo-placeholder {
-  width: 36px;
-  height: 36px;
-  background-color: #e0ddd8;
-  border-radius: 6px;
-  flex-shrink: 0;
+.sidebar-logo-img {
+  width: 200px;
+  height: auto;
+  object-fit: contain;
 }
 
 .logo-text {
