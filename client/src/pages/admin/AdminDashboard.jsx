@@ -46,8 +46,8 @@ function AdminDashboard() {
       //   [{ id, title, category, date, venue, registrations, registrationPercent, status }, ...]
 
       // const [statsRes, eventsRes] = await Promise.all([
-      //   fetch('/api/admin/stats'),
-      //   fetch('/api/admin/events'),
+      //   fetch('/dashboard'),
+      //   fetch('/dashboard'),
       // ]);
       // const statsData = await statsRes.json();
       // const eventsData = await eventsRes.json();

@@ -61,7 +61,7 @@ function AttendanceScanner() {
       // Expected shape:
       //   [{ id, name, studentNo, status, attended }, ...]
       //
-      // const res = await fetch(`/api/admin/events/${id}/attendees`);
+      // const res = await fetch(`/checkin/${id}`);
       // const data = await res.json();
       // setAttendees(data);
 
@@ -74,30 +74,18 @@ function AttendanceScanner() {
   }
 
   // ─── Manual search ────────────────────────────────────────────────────────
-  async function handleSearch() {
+  function handleSearch() {
     if (!searchQuery.trim()) {
       setSearchResults(null);
       return;
     }
-    try {
-      // TODO (backend): search attendees by name or student number
-      //
-      // const res = await fetch(
-      //   `/api/admin/events/${id}/attendees/search?q=${encodeURIComponent(searchQuery)}`
-      // );
-      // const data = await res.json();
-      // setSearchResults(data);
-
-      // Local filter for mock:
-      const filtered = attendees.filter(
-        (a) =>
-          a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          a.studentNo.includes(searchQuery)
-      );
-      setSearchResults(filtered);
-    } catch (error) {
-      console.error('Search failed:', error);
-    }
+    // filter from already loaded attendees — no fetch needed
+    const filtered = attendees.filter(
+      (a) =>
+        a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        a.studentNo.includes(searchQuery)
+    );
+    setSearchResults(filtered);
   }
 
   function handleSearchKeyDown(e) {
@@ -115,7 +103,7 @@ function AttendanceScanner() {
       // TODO (backend): POST to mark attendee as attended
       //
       // const res = await fetch(
-      //   `/api/admin/events/${id}/attendees/${attendeeId}/attend`,
+      //   `/checkin/manual`,
       //   { method: 'POST', headers: { 'Accept': 'application/json' } }
       // );
       // if (!res.ok) throw new Error('Failed to mark attended');

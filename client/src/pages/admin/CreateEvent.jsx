@@ -103,7 +103,7 @@ function CreateEvent() {
       // formData.append('status', status); // 'draft' or 'published'
       // if (form.poster) formData.append('poster', form.poster);
       //
-      // const res = await fetch('/api/admin/events', {
+      // const res = await fetch('/event/submit', {
       //   method: 'POST',
       //   headers: { 'Accept': 'application/json' },
       //   body: formData,

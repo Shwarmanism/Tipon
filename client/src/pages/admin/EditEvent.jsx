@@ -45,7 +45,7 @@ function EditEvent() {
     try {
       // TODO (backend): fetch the existing event from Laravel
       //
-      // const res = await fetch(`/api/admin/events/${id}`);
+      // const res = await fetch(`/event/edit/${id}`);
       // const data = await res.json();
       // setForm({
       //   title: data.title,
@@ -133,7 +133,7 @@ function EditEvent() {
       // formData.append('status', status);
       // if (form.poster) formData.append('poster', form.poster);
       //
-      // const res = await fetch(`/api/admin/events/${id}`, {
+      // const res = await fetch(`/event/update/${id}`, {
       //   method: 'POST', // POST with _method: PUT for FormData
       //   headers: { 'Accept': 'application/json' },
       //   body: formData,

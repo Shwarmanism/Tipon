@@ -67,7 +67,7 @@ function EventReport() {
       //   manifest: [{ no, name, email, checkInTime, status }, ...],
       // }
       //
-      // const res = await fetch(`/api/admin/events/${id}/report`);
+      // const res = await fetch(`/report/${id}`);
       // const data = await res.json();
       // setEventInfo(data.event);
       // setStats(data.stats);
