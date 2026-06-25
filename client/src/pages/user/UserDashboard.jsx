@@ -91,38 +91,39 @@ const MOCK_EVENTS = [
 
 function UserDashboard() {
   const navigate = useNavigate();
-  const [events, setEvents]           = useState([]);
-  const [loading, setLoading]         = useState(false);
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [totalEvents, setTotalEvents] = useState(0);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   useEffect(() => {
     fetchEvents();
   }, []);
 
- async function fetchEvents() {
-  setLoading(true);
-  try {
-    const token = localStorage.getItem('token');
-    const res = await fetch('http://127.0.0.1:8000/api/user/dashboard', {
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-    if (!res.ok) throw new Error('Failed to fetch events');
-    const data = await res.json();
-    setEvents(data.events);
-    setTotalEvents(data.total);
-  } catch (error) {
-    console.error('Failed to fetch events:', error);
-    // ↓ add this fallback
-    setEvents(MOCK_EVENTS);
-    setTotalEvents(MOCK_EVENTS.length);
-  } finally {
-    setLoading(false);
+  async function fetchEvents() {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://127.0.0.1:8000/api/user/dashboard', {
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) throw new Error('Failed to fetch events');
+      const data = await res.json();
+      setEvents(data.events);
+      setTotalEvents(data.total);
+    } catch (error) {
+      console.error('Failed to fetch events:', error);
+      // ↓ add this fallback
+      setEvents(MOCK_EVENTS);
+      setTotalEvents(MOCK_EVENTS.length);
+    } finally {
+      setLoading(false);
+    }
   }
-}
 
   // ─── Register for event ───────────────────────────────────────────────────
   async function handleRegister(eventId) {
@@ -138,7 +139,7 @@ function UserDashboard() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Registration failed');
-      
+
       alert(data.message);
       await fetchEvents(); // refetch to update status
     } catch (error) {
@@ -154,9 +155,8 @@ function UserDashboard() {
   }
 
   // ─── View ticket ──────────────────────────────────────────────────────────
-  function handleViewTicket(eventId) {
-    // Maps to: GET /ticket/{id}  (TicketController@showQR)
-    navigate(`/user/tickets/${eventId}`);
+  function handleViewTicket(event) {
+    setSelectedEvent(event);
   }
 
   // ─── Navigate to event details ────────────────────────────────────────────
@@ -223,12 +223,9 @@ function UserDashboard() {
         );
       case 'registered':
         return (
-          <button
-            className="btn btn-user-ticket"
-            onClick={() => handleViewTicket(event.id)}
-          >
-            View Ticket
-          </button>
+          <span className="text-success fw-semibold" style={{ fontSize: '0.9rem' }}>
+            <i className="bi bi-check-circle-fill me-1"></i> Registered
+          </span>
         );
       case 'coming_soon':
         return null;
@@ -300,36 +297,11 @@ function UserDashboard() {
                   {getStatusBadge(event)}
                 </div>
 
-                {/* ── Login Prompt Modal ──────────────────────────────── */}
-                {showLoginPrompt && (
-                  <div className="qr-modal-overlay" onClick={() => setShowLoginPrompt(false)}>
-                    <div className="qr-modal-card" onClick={(e) => e.stopPropagation()}>
-                      <button className="qr-modal-close" onClick={() => setShowLoginPrompt(false)}>
-                        <i className="bi bi-x-lg"></i>
-                      </button>
 
-                      <div className="mb-3" style={{ fontSize: '2.5rem', color: '#e8611a' }}>
-                        <i className="bi bi-lock-fill"></i>
-                      </div>
-
-                      <h6 className="qr-modal-title">Register to view your QR</h6>
-                      <p className="text-muted" style={{ fontSize: '0.85rem' }}>
-                        You need to register for this event first before you can access your ticket QR code.
-                      </p>
-
-                      <button
-                        className="btn btn-create-event w-100 mt-2"
-                        onClick={() => setShowLoginPrompt(false)}
-                      >
-                        Got it
-                      </button>
-                    </div>
-                  </div>
-                )}
               </div>
 
-             {/* Card body */}
-              <div className={`user-card-body ${event.status === 'registered' ? 'user-card-body--registered' : ''}`}>
+              {/* Card body */}
+              <div className="user-card-body user-card-body--registered">
                 <div className="user-card-body-info">
                   <h5 className="user-card-title">{event.title}</h5>
                   <p className="user-card-meta">
@@ -348,32 +320,90 @@ function UserDashboard() {
                   </div>
                 </div>
 
-                {/* Blurred QR — only for registered events */}
-                {event.status === 'registered' && (
-                  <div
-                    className="user-card-qr-preview"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowLoginPrompt(true);
-                      }}
-                    title="View ticket"
-                  >
-                    <div className="user-card-qr-blur">
-                      <QRCode
-                        value={event.ticketCode ?? String(event.id)}
-                        size={70}
-                        level="H"
-                      />
-                    </div>
-                    <div className="user-card-qr-hint">
-                      <i className="bi bi-eye"></i>
-                    </div>
+                {/* Blurred QR */}
+                <div
+                  className="user-card-qr-preview"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (event.status === 'registered') {
+                      handleViewTicket(event);
+                    } else {
+                      setShowLoginPrompt(true);
+                    }
+                  }}
+                  title={event.status === 'registered' ? "View ticket" : "Register to view"}
+                >
+                  <div className="user-card-qr-blur" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '70px', height: '70px', backgroundColor: '#f0f0f0', borderRadius: '8px' }}>
+                    <i className="bi bi-qr-code" style={{ fontSize: '3rem', color: '#ccc' }}></i>
                   </div>
-                )}
+                  <div className="user-card-qr-hint" style={{ pointerEvents: 'none' }}>
+                    <i className={event.status === 'registered' ? "bi bi-eye" : "bi bi-lock-fill"}></i>
+                  </div>
+                </div>
               </div>
 
             </div>
           ))}
+        </div>
+      )}
+
+      {/* ── Login Prompt Modal ──────────────────────────────── */}
+      {showLoginPrompt && (
+        <div className="qr-modal-overlay" onClick={() => setShowLoginPrompt(false)}>
+          <div className="qr-modal-card" onClick={(e) => e.stopPropagation()}>
+            <button className="qr-modal-close" onClick={() => setShowLoginPrompt(false)}>
+              <i className="bi bi-x-lg"></i>
+            </button>
+
+            <div className="mb-3" style={{ fontSize: '2.5rem', color: '#e8611a' }}>
+              <i className="bi bi-lock-fill"></i>
+            </div>
+
+            <h6 className="qr-modal-title">Register to view your QR</h6>
+            <p className="text-muted" style={{ fontSize: '0.85rem' }}>
+              You need to register for this event first before you can access your ticket QR code.
+            </p>
+
+            <button
+              className="btn btn-create-event w-100 mt-2"
+              onClick={() => setShowLoginPrompt(false)}
+            >
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Ticket Modal ────────────────────────────────────── */}
+      {selectedEvent && (
+        <div className="qr-modal-overlay" onClick={() => setSelectedEvent(null)}>
+          <div className="qr-modal-card" onClick={(e) => e.stopPropagation()}>
+            <button className="qr-modal-close" onClick={() => setSelectedEvent(null)}>
+              <i className="bi bi-x-lg"></i>
+            </button>
+
+            <h6 className="qr-modal-title" style={{ textTransform: 'uppercase', marginBottom: '0.1rem' }}>
+              {selectedEvent.title}
+            </h6>
+            <p className="qr-modal-code" style={{ marginBottom: '1.25rem' }}>
+              {selectedEvent.ticketCode || 'TK - XXX'}
+            </p>
+
+            <div style={{ backgroundColor: '#f5f5f5', borderRadius: '10px', padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '1rem' }}>
+              <QRCode
+                value={selectedEvent.ticketCode || String(selectedEvent.id)}
+                size={180}
+                level="H"
+                style={{ marginBottom: '1rem', mixBlendMode: 'multiply' }}
+              />
+              <p className="qr-modal-hint">QR code will appear here</p>
+            </div>
+
+            <p className="text-muted" style={{ fontSize: '0.85rem', marginBottom: 0 }}>
+              <i className="bi bi-info-circle me-1"></i>
+              Show this QR code to the scanner at the venue entrance.
+            </p>
+          </div>
         </div>
       )}
     </div>

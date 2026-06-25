@@ -60,7 +60,7 @@ function EditEvent() {
         endTime: data.event.end_time,
         totalSlots: String(data.event.total_slots),
         poster: null,
-        posterPreview: data.event.poster_url ?? '',
+        posterPreview: data.event.poster_path ? `http://127.0.0.1:8000/storage/${data.event.poster_path}` : '',
       });
     } catch (error) {
       console.error('Failed to fetch event:', error);
