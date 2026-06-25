@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import logo from '../../assets/images/logo.png';
 import './admin.css';
 
 function AdminLayout() {
@@ -30,8 +31,7 @@ function AdminLayout() {
       <aside className="admin-sidebar">
         {/* Logo */}
         <div className="sidebar-logo">
-          <div className="logo-placeholder"></div>
-          <span className="logo-text">Tipon</span>
+          <img src={logo} alt="Tipon" className="sidebar-logo-img" />
         </div>
 
         <hr className="sidebar-divider" />
@@ -56,6 +56,17 @@ function AdminLayout() {
           >
             <i className="bi bi-calendar-event me-2"></i>
             Events
+          </NavLink>
+
+          <p className="sidebar-section-label mt-3">ACCOUNT</p>
+          <NavLink
+            to="/admin/profile"
+            className={({ isActive }) =>
+              'sidebar-link' + (isActive ? ' active' : '')
+            }
+          >
+            <i className="bi bi-person me-2"></i>
+            Profile
           </NavLink>
         </nav>
 
