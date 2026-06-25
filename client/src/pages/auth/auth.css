@@ -1,0 +1,164 @@
+/* ─── Auth Wrapper (two-panel layout) ─────────────────── */
+.auth-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background-color: #ffffff;
+}
+
+/* ─── Left Panel ───────────────────────────────────────── */
+.auth-left-panel {
+  display: none; /* hidden on small screens */
+  width: 55%;
+  background-color: #fff4ec;
+  border-radius: 0 50px 50px 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem;
+}
+
+@media (min-width: 1400px) {
+  .auth-left-panel {
+    display: flex; /* show on xxl screens, matching original 2xl: breakpoint */
+  }
+
+  .auth-right-panel {
+    width: 45%;
+  }
+}
+
+.auth-logo {
+  height: 96px;
+  width: auto;
+  margin-bottom: 2rem;
+}
+
+.auth-illustration {
+  width: 500px;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.auth-panel-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.auth-panel-subtitle {
+  font-size: 1rem;
+  color: #888;
+  margin-bottom: 0;
+}
+
+/* ─── Right Panel ──────────────────────────────────────── */
+.auth-right-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+
+/* ─── Auth Card ────────────────────────────────────────── */
+.auth-card {
+  width: 100%;
+  max-width: 500px;
+  background-color: #ffffff;
+  border: 1px solid #fbd5b5;
+  border-radius: 24px;
+  padding: 2.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+/* ─── Auth Headings ────────────────────────────────────── */
+.auth-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #e8611a;
+  text-align: center;
+  margin-bottom: 0.25rem;
+}
+
+.auth-subtitle {
+  font-size: 0.875rem;
+  color: #888;
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
+/* ─── Input with icon ──────────────────────────────────── */
+.auth-input-wrapper {
+  position: relative;
+}
+
+.auth-input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #bbb;
+  font-size: 0.95rem;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.auth-input {
+  padding-left: 2.5rem !important;
+}
+
+.auth-input-icon-right {
+  padding-right: 2.75rem !important;
+}
+
+/* ─── Eye toggle button ────────────────────────────────── */
+.auth-eye-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #bbb;
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 0;
+  z-index: 2;
+  line-height: 1;
+}
+
+.auth-eye-btn:hover {
+  color: #888;
+}
+
+/* ─── Hint text under email field ──────────────────────── */
+.auth-hint {
+  font-size: 0.75rem;
+  color: #aaa;
+  margin-top: 0.25rem;
+  margin-bottom: 0;
+}
+
+/* ─── Auth link (Sign In / Sign Up / Forgot Password) ──── */
+.auth-link {
+  color: #e8611a;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-link:hover {
+  color: #cf5515;
+  text-decoration: underline;
+}
+
+/* Override global #root styles for auth layout */
+#root:has(.auth-wrapper) {
+  width: 100%;
+  max-width: 100%;
+  text-align: left;
+  margin: 0;
+  padding: 0;
+  border-inline: none;
+}
