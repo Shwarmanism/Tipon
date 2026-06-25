@@ -65,8 +65,7 @@ function AdminDashboard() {
   }
 
   function handleScan(eventId) {
-    // TODO (backend): navigate to scanner page or open scan modal for this event
-    console.log('Scan event:', eventId);
+    navigate(`/admin/events/${eventId}/scan`);
   }
 
   function handleReport(eventId) {

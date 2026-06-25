@@ -522,3 +522,208 @@
   border: none;
   display: block;
 }
+
+/* ─── Attendance Scanner Layout ───────────────────────── */
+.scanner-layout {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.scanner-left {
+  flex: 0 0 45%;
+  min-width: 0;
+}
+
+.scanner-right {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ─── Event Info Bar ───────────────────────────────────── */
+.scanner-info-bar {
+  display: flex;
+  gap: 2rem;
+  background-color: #ffffff;
+  border: 1px solid #eeebe6;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+}
+
+.scanner-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.scanner-info-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #aaa;
+}
+
+.scanner-info-value {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+/* ─── Camera Area ──────────────────────────────────────── */
+.scanner-camera-area {
+  position: relative;
+  background-color: #d9d9d9;
+  border-radius: 12px;
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Corner bracket styles */
+.scanner-corner {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border-color: #e8611a;
+  border-style: solid;
+}
+
+.scanner-corner.tl {
+  top: 20px;
+  left: 20px;
+  border-width: 3px 0 0 3px;
+  border-radius: 2px 0 0 0;
+}
+
+.scanner-corner.tr {
+  top: 20px;
+  right: 20px;
+  border-width: 3px 3px 0 0;
+  border-radius: 0 2px 0 0;
+}
+
+.scanner-corner.bl {
+  bottom: 20px;
+  left: 20px;
+  border-width: 0 0 3px 3px;
+  border-radius: 0 0 0 2px;
+}
+
+.scanner-corner.br {
+  bottom: 20px;
+  right: 20px;
+  border-width: 0 3px 3px 0;
+  border-radius: 0 0 2px 0;
+}
+
+/* Placeholder (camera not active) */
+.scanner-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: #999;
+  font-size: 0.875rem;
+}
+
+.scanner-placeholder-icon {
+  font-size: 2rem;
+  color: #bbb;
+}
+
+/* ─── Manual Check-in Section Label ───────────────────── */
+.scanner-section-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #aaa;
+  margin-bottom: 0;
+}
+
+/* ─── Search Row ───────────────────────────────────────── */
+.scanner-search-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.scanner-search-input {
+  flex: 1;
+  font-size: 0.875rem;
+  border: 1px solid #e0ddd8;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  color: #333;
+  background-color: #fff;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.scanner-search-input:focus {
+  border-color: #e8611a;
+  box-shadow: 0 0 0 3px rgba(232, 97, 26, 0.12);
+  outline: none;
+}
+
+.scanner-search-input::placeholder {
+  color: #bbb;
+}
+
+.btn-scanner-search {
+  background-color: #e8611a;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  width: 46px;
+  height: 46px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.btn-scanner-search:hover {
+  background-color: #cf5515;
+  color: #fff;
+}
+
+/* ─── Attendees Table ──────────────────────────────────── */
+.scanner-table-wrapper {
+  background-color: #ffffff;
+  border: 1px solid #eeebe6;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* ─── Status Badges ────────────────────────────────────── */
+.scanner-badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+}
+
+.scanner-badge-active {
+  background-color: #e6f4ec;
+  color: #2e7d52;
+}
+
+.scanner-badge-attended {
+  background-color: #e8f4f8;
+  color: #2a7fa5;
+}
+
+.scanner-badge-inactive {
+  background-color: #f0f0f0;
+  color: #777;
+}
+
+/* ─── Attended label (replaces button after marking) ──── */
+.scanner-attended-label {
+  font-size: 0.8rem;
+  color: #2e7d52;
+  font-weight: 500;
+}
