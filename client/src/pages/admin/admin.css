@@ -141,6 +141,41 @@
   color: #555;
 }
 
+.sidebar-user-wrapper {
+  position: relative;
+}
+
+.sidebar-user-dropdown {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 0;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, .10);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .12);
+  min-width: 140px;
+  z-index: 200;
+  overflow: hidden;
+}
+
+.sidebar-user-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  font-size: .875rem;
+  color: #dc3545;
+  cursor: pointer;
+  transition: background .15s;
+}
+
+.sidebar-user-dropdown-item:hover {
+  background: #fff5f5;
+}
+
 /* ─── Page Header ─────────────────────────────────────── */
 .admin-page-title {
   font-size: 1.5rem;
@@ -759,4 +794,66 @@
   justify-content: center;
   color: #bbb;
   font-size: 0.875rem;
+}
+
+/* ─── Admin Events Grid ────────────────────────────────── */
+.admin-events-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 992px) {
+  .admin-events-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.admin-event-card {
+  background: #fff;
+  border: 1px solid #eeebe6;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.admin-event-card:hover {
+  box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+}
+
+.admin-event-card-poster {
+  position: relative;
+  height: 160px;
+  background: #f0ede8;
+  overflow: hidden;
+}
+
+.admin-event-card-poster-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-event-card-poster-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #e8611a 0%, #f4a261 100%);
+  opacity: 0.85;
+}
+
+.admin-event-card-body {
+  padding: 1rem 1.25rem;
+}
+
+.admin-event-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 0.4rem;
+}
+
+.admin-event-card-meta {
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 0.2rem;
 }

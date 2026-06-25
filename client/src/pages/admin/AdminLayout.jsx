@@ -1,7 +1,29 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { useState } from 'react';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import './admin.css';
 
 function AdminLayout() {
+  const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  async function handleLogout() {
+    const token = localStorage.getItem('token');
+    try {
+      await fetch('http://127.0.0.1:8000/api/logout', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+        },
+      });
+    } catch (err) {
+      console.error('Logout request failed:', err);
+    } finally {
+      localStorage.removeItem('token');
+      navigate('/login');
+    }
+  }
+
   return (
     <div className="admin-wrapper">
       {/* SIDEBAR */}
@@ -38,15 +60,34 @@ function AdminLayout() {
         </nav>
 
         {/* Bottom user info */}
-        <div className="sidebar-user">
-          <div className="user-avatar-placeholder"></div>
-          <div className="user-info">
-            <span className="user-name">Admin Portal</span>
-            <span className="user-role">Tipon Admin Staff</span>
+        <div className="sidebar-user-wrapper">
+          <div className="sidebar-user">
+            <div className="user-avatar-placeholder"></div>
+            <div className="user-info">
+              <span className="user-name">Admin Portal</span>
+              <span className="user-role">Tipon Admin Staff</span>
+            </div>
+            <button
+              className="btn btn-link sidebar-user-menu p-0"
+              onClick={() => setMenuOpen(prev => !prev)}
+              aria-label="User menu"
+              aria-expanded={menuOpen}
+            >
+              <i className="bi bi-three-dots-vertical"></i>
+            </button>
           </div>
-          <button className="btn btn-link sidebar-user-menu p-0">
-            <i className="bi bi-three-dots-vertical"></i>
-          </button>
+
+          {menuOpen && (
+            <div className="sidebar-user-dropdown">
+              <button
+                className="sidebar-user-dropdown-item"
+                onClick={handleLogout}
+              >
+                <i className="bi bi-box-arrow-right"></i>
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </aside>
 
