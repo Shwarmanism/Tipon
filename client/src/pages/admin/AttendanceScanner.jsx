@@ -31,11 +31,11 @@ function AttendanceScanner() {
 
   useEffect(() => {
     fetchEventInfo();
-    fetchAttendees();
   }, [id]);
 
-  // ─── Fetch event details for the info bar ─────────────────────────────────
+  // ─── Fetch event details and attendees ─────────────────────────────────
   async function fetchEventInfo() {
+    setLoading(true);
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(`http://127.0.0.1:8000/api/admin/checkin/${id}`, {
@@ -43,31 +43,17 @@ function AttendanceScanner() {
       });
       if (!res.ok) throw new Error('Failed to fetch event info');
       const data = await res.json();
+      
       setEventInfo({
         title: data.event.title,
         date: data.event.event_date,
         venue: data.event.venue,
       });
-    } catch (error) {
-      console.error('Failed to fetch event info:', error);
-    }
-  }
 
-  // ─── Fetch registered attendees ───────────────────────────────────────────
-  async function fetchAttendees() {
-    setLoading(true);
-    try {
-      // TODO (backend): fetch attendees for this event
-      // Expected shape:
-      //   [{ id, name, studentNo, status, attended }, ...]
-      //
-      // const res = await fetch(`/checkin/${id}`);
-      // const data = await res.json();
-      // setAttendees(data);
-
-      setAttendees(MOCK_ATTENDEES);
+      // data.attendees is populated from the backend now
+      setAttendees(data.attendees || []);
     } catch (error) {
-      console.error('Failed to fetch attendees:', error);
+      console.error('Failed to fetch event info and attendees:', error);
     } finally {
       setLoading(false);
     }
@@ -234,7 +220,7 @@ function AttendanceScanner() {
             <input
               type="text"
               className="form-control scanner-search-input"
-              placeholder="Search by name or student number . . ."
+              placeholder="Search by name or email . . ."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleSearchKeyDown}
@@ -250,7 +236,7 @@ function AttendanceScanner() {
               <thead>
                 <tr>
                   <th>STUDENT NAME</th>
-                  <th>STUDENT NO.</th>
+                  <th>EMAIL</th>
                   <th>STATUS</th>
                   <th className="text-end">ACTION</th>
                 </tr>

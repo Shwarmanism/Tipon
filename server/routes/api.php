@@ -10,8 +10,25 @@ Route::post('/register', [AuthController::class, 'registerSubmit']);
 
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\TicketController;
 
 Route::middleware('auth:sanctum')->group(function () {
+    /* Role A: Normal User (Student / Attendee) */
+    Route::group(['prefix' => 'user'], function () {
+        Route::get('/dashboard', [EventController::class, 'studentDashboard']);
+        Route::get('/event/{id}', [EventController::class, 'studentShow']);
+        Route::get('/tickets', [TicketController::class, 'list']);
+        Route::get('/ticket/{id}', [TicketController::class, 'showQR']);
+        Route::post('/register/{event_id}', [TicketController::class, 'store']);
+        Route::post('/cancel/{id}', [TicketController::class, 'cancel']);
+        Route::post('/feedback/{event_id}', [EventController::class, 'feedbackSubmit']);
+        
+        // Profile Endpoints
+        Route::get('/profile', [AuthController::class, 'getProfile']);
+        Route::post('/profile/update', [AuthController::class, 'updateProfile']);
+        Route::put('/profile/password', [AuthController::class, 'updatePassword']);
+    });
+
     /* Role B: Admin (Organization Officer) */
     Route::group(['prefix' => 'admin'], function () {
         // Dashboard Analytics

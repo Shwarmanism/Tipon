@@ -39,18 +39,17 @@ function UserProfile() {
   async function fetchProfile() {
     setLoading(true);
     try {
-      // TODO (backend): GET /profile
-      //
-      // const res = await fetch('/profile', {
-      //   headers: { Accept: 'application/json' },
-      // });
-      // const data = await res.json();
-      // setUser(data);
-      // setForm({ name: data.name, email: data.email });
-
-      // Remove once API is connected:
-      setUser(MOCK_USER);
-      setForm({ name: MOCK_USER.name, email: MOCK_USER.email });
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://127.0.0.1:8000/api/user/profile', {
+        headers: { 
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+      if (!res.ok) throw new Error('Failed to fetch profile');
+      const data = await res.json();
+      setUser(data);
+      setForm({ name: data.name, email: data.email });
     } catch (err) {
       console.error('Failed to fetch profile:', err);
     } finally {
@@ -73,19 +72,19 @@ function UserProfile() {
     setSaving(true);
     setSaveSuccess(false);
     try {
-      // TODO (backend): POST /profile/update (to be added by backend)
-      //
-      // const res = await fetch(`/profile/update/${user.id}`, {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     Accept: 'application/json',
-      //   },
-      //   body: JSON.stringify(form),
-      // });
-      // if (!res.ok) throw new Error('Update failed');
-      // const data = await res.json();
-      // setUser(data);
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://127.0.0.1:8000/api/user/profile/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error('Update failed');
+      const data = await res.json();
+      setUser(data);
 
       console.log('Saving profile:', form);
       setUser((prev) => ({ ...prev, ...form }));
@@ -115,20 +114,22 @@ function UserProfile() {
 
     setChangingPassword(true);
     try {
-      // TODO (backend): PUT /profile/password (to be added by backend)
-      //
-      // const res = await fetch('/profile/password', {
-      //   method: 'PUT',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     Accept: 'application/json',
-      //   },
-      //   body: JSON.stringify({
-      //     current_password: passwordForm.currentPassword,
-      //     new_password: passwordForm.newPassword,
-      //   }),
-      // });
-      // if (!res.ok) throw new Error('Password change failed');
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://127.0.0.1:8000/api/user/profile/password', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          current_password: passwordForm.currentPassword,
+          new_password: passwordForm.newPassword,
+        }),
+      });
+      
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Password change failed');
 
       console.log('Changing password');
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });

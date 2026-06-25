@@ -90,9 +90,9 @@ const MOCK_EVENTS = [
 
 function UserDashboard() {
   const navigate = useNavigate();
-  const [events, setEvents]           = useState(MOCK_EVENTS);
+  const [events, setEvents]           = useState([]);
   const [loading, setLoading]         = useState(false);
-  const [totalEvents, setTotalEvents] = useState(MOCK_EVENTS.length);
+  const [totalEvents, setTotalEvents] = useState(0);
 
   useEffect(() => {
     fetchEvents();
@@ -101,20 +101,17 @@ function UserDashboard() {
   async function fetchEvents() {
     setLoading(true);
     try {
-      // TODO (backend): fetch published events from Laravel
-      // Maps to: GET /dashboard
-      // Expected shape: { total: number, events: [...] }
-      //
-      // const res = await fetch('/dashboard', {
-      //   headers: { 'Accept': 'application/json' },
-      // });
-      // const data = await res.json();
-      // setEvents(data.events);
-      // setTotalEvents(data.total);
-
-      // Remove once API is connected:
-      setEvents(MOCK_EVENTS);
-      setTotalEvents(MOCK_EVENTS.length);
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://127.0.0.1:8000/api/user/dashboard', {
+        headers: { 
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+      if (!res.ok) throw new Error('Failed to fetch events');
+      const data = await res.json();
+      setEvents(data.events);
+      setTotalEvents(data.total);
     } catch (error) {
       console.error('Failed to fetch events:', error);
     } finally {
@@ -125,30 +122,30 @@ function UserDashboard() {
   // ─── Register for event ───────────────────────────────────────────────────
   async function handleRegister(eventId) {
     try {
-      // TODO (backend): POST to Laravel register endpoint
-      // Maps to: POST /register/{event_id}  (TicketController@store)
-      //
-      // const res = await fetch(`/register/${eventId}`, {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'Accept': 'application/json',
-      //   },
-      // });
-      // if (!res.ok) throw new Error('Registration failed');
-      // await fetchEvents(); // refetch to update status
-
-      console.log('Register for event:', eventId);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://127.0.0.1:8000/api/user/register/${eventId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Registration failed');
+      
+      alert(data.message);
+      await fetchEvents(); // refetch to update status
     } catch (error) {
       console.error('Failed to register:', error);
+      alert('Registration failed: ' + error.message);
     }
   }
 
   // ─── Join waitlist ─────────────────────────────────────────────────────────
-  // NOTE: No dedicated waitlist endpoint in web.php.
-  // Ask backend to add: POST /waitlist/{event_id}
   function handleJoinWaitlist(eventId) {
-    console.log('Join waitlist for event:', eventId);
+    // We use the same register endpoint for waitlisting
+    handleRegister(eventId);
   }
 
   // ─── View ticket ──────────────────────────────────────────────────────────
@@ -205,7 +202,7 @@ function UserDashboard() {
         return (
           <button
             className="btn btn-user-register"
-            onClick={() => handleRegister(event.id)}
+            onClick={() => handleViewEvent(event.id)}
           >
             Register
           </button>
@@ -214,7 +211,7 @@ function UserDashboard() {
         return (
           <button
             className="btn btn-user-waitlist"
-            onClick={() => handleJoinWaitlist(event.id)}
+            onClick={() => handleViewEvent(event.id)}
           >
             Join Waitlist
           </button>

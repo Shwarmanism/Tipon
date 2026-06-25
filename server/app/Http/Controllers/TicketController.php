@@ -17,10 +17,25 @@ class TicketController extends Controller
         $tickets = DB::table('tickets')
             ->join('events', 'tickets.event_id', 'events.id')
             ->where('tickets.user_id', Auth::id())
-            ->select('tickets.*', 'events.title', 'events.event_date')
+            ->select('tickets.*', 'events.title', 'events.event_date', 'events.venue')
             ->get();
 
-        return view('student.tickets.list', compact('tickets'));
+        $formatted = $tickets->map(function ($ticket) {
+            return [
+                'id' => $ticket->id,
+                'ticketCode' => 'TK - ' . str_pad($ticket->id, 3, '0', STR_PAD_LEFT),
+                'qrUrl' => null, // Placeholder for actual QR URL
+                'status' => $ticket->status,
+                'event' => [
+                    'id' => $ticket->event_id,
+                    'title' => $ticket->title,
+                    'date' => \Carbon\Carbon::parse($ticket->event_date)->format('D M d, Y \– g:i A'),
+                    'venue' => $ticket->venue,
+                ]
+            ];
+        });
+
+        return response()->json($formatted);
     }
 
    
@@ -29,9 +44,39 @@ class TicketController extends Controller
         $ticket = DB::table('tickets')
                     ->where('id', $id)
                     ->where('user_id', Auth::id())
-                    ->firstOrFail();
+                    ->first();
 
-        return view('student.tickets.show', compact('ticket'));
+        if (!$ticket) return response()->json(['error' => 'Ticket not found'], 404);
+
+        $event = DB::table('events')->where('id', $ticket->event_id)->first();
+        if (!$event) return response()->json(['error' => 'Event not found'], 404);
+
+        $registeredCount = DB::table('tickets')
+            ->where('event_id', $event->id)
+            ->where('status', 'active')
+            ->count();
+
+        $ticketData = [
+            'id' => $ticket->id,
+            'ticketCode' => 'TK - ' . str_pad($ticket->id, 3, '0', STR_PAD_LEFT),
+            'qrUrl' => null,
+            'eventStartsAt' => $event->event_date,
+            'event' => [
+                'id' => $event->id,
+                'title' => $event->title,
+                'date' => \Carbon\Carbon::parse($event->event_date)->format('D M d, Y \– g:i A'),
+                'venue' => $event->venue,
+                'category' => $event->category,
+                'description' => $event->description,
+                'targetAudience' => $event->target_audience,
+                'totalSlots' => $event->total_slots,
+                'registeredCount' => $registeredCount,
+                'waitlistedCount' => 0, // Simplified for now
+                'posterUrl' => null,
+            ]
+        ];
+
+        return response()->json(['ticket' => $ticketData]);
     }
 
 
@@ -40,7 +85,8 @@ class TicketController extends Controller
     
         return DB::transaction(function () use ($event_id) {
             
-            $event = DB::table('events')->where('id', $event_id)->lockForUpdate()->firstOrFail();
+            $event = DB::table('events')->where('id', $event_id)->lockForUpdate()->first();
+            if (!$event) return response()->json(['error' => 'Event not found'], 404);
 
             $existingTicket = DB::table('tickets')
                                 ->where('user_id', Auth::id())
@@ -49,7 +95,7 @@ class TicketController extends Controller
                                 ->first();
 
             if ($existingTicket) {
-                return back()->withErrors(['message' => 'You are already registered or waitlisted for this event.']);
+                return response()->json(['error' => 'You are already registered or waitlisted for this event.'], 400);
             }
 
             $activeCount = DB::table('tickets')->where('event_id', $event_id)->where('status', 'active')->count();
@@ -57,7 +103,7 @@ class TicketController extends Controller
             $status = ($activeCount < $event->total_slots) ? 'active' : 'waitlisted';
 
             
-            DB::table('tickets')->insert([
+            $ticketId = DB::table('tickets')->insertGetId([
                 'user_id' => Auth::id(),
                 'event_id' => $event_id,
                 'qr_code_uuid' => Str::uuid(),
@@ -65,10 +111,10 @@ class TicketController extends Controller
             ]);
 
             if ($status === 'waitlisted') {
-                return redirect()->route('student.tickets')->with('warning', 'Event is full. You have been added to the waitlist!');
+                return response()->json(['success' => true, 'status' => 'waitlisted', 'message' => 'Event is full. You have been added to the waitlist!', 'ticket_id' => $ticketId]);
             }
 
-            return redirect()->route('student.tickets')->with('success', 'Successfully registered! Your ticket is now in your wallet.');
+            return response()->json(['success' => true, 'status' => 'active', 'message' => 'Successfully registered! Your ticket is now in your wallet.', 'ticket_id' => $ticketId]);
         });
     }
 
@@ -79,7 +125,9 @@ class TicketController extends Controller
             $ticket = DB::table('tickets')
                         ->where('id', $id)
                         ->where('user_id', Auth::id())
-                        ->firstOrFail();
+                        ->first();
+
+            if (!$ticket) return response()->json(['error' => 'Ticket not found'], 404);
 
             // Mark the student's ticket as cancelled
             DB::table('tickets')
@@ -101,7 +149,7 @@ class TicketController extends Controller
                     ->update(['status' => 'active']);
             }
 
-            return back()->with('success', 'Your registration has been cancelled.');
+            return response()->json(['success' => true, 'message' => 'Your registration has been cancelled.']);
         });
     }
 }

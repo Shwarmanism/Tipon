@@ -53,16 +53,39 @@ function EventDetails() {
   async function fetchEvent() {
     setLoading(true);
     try {
-      // TODO (backend): GET /event/{id}  (EventController@show)
-      //
-      // const res = await fetch(`/event/${id}`, {
-      //   headers: { Accept: 'application/json' },
-      // });
-      // const data = await res.json();
-      // setEvent(data);
+      const token = localStorage.getItem('token');
+      
+      // Fetch event details
+      const res = await fetch(`http://127.0.0.1:8000/api/user/event/${id}`, {
+        headers: { 
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+      if (!res.ok) throw new Error('Failed to fetch event');
+      const eventData = await res.json();
+      setEvent(eventData);
 
-      // Remove once API is connected:
-      setEvent(MOCK_EVENT);
+      // Fetch user profile to pre-fill form
+      const profileRes = await fetch('http://127.0.0.1:8000/api/user/profile', {
+        headers: { 
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+      if (profileRes.ok) {
+        const profileData = await profileRes.json();
+        const nameParts = profileData.name.split(' ');
+        const firstName = nameParts[0] || '';
+        const lastName = nameParts.slice(1).join(' ') || '';
+        
+        setForm(prev => ({
+          ...prev,
+          firstName,
+          lastName,
+          email: profileData.email
+        }));
+      }
     } catch (err) {
       console.error('Failed to fetch event:', err);
     } finally {
@@ -86,20 +109,21 @@ function EventDetails() {
     }
     setSubmitting(true);
     try {
-      // TODO (backend): POST /register/{event_id}  (TicketController@store)
-      //
-      // const res = await fetch(`/register/${id}`, {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     Accept: 'application/json',
-      //   },
-      //   body: JSON.stringify(form),
-      // });
-      // if (!res.ok) throw new Error('Registration failed');
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://127.0.0.1:8000/api/user/register/${id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Registration failed');
 
-      console.log('Submitting registration:', form);
       setSubmitted(true);
+      alert(data.message);
     } catch (err) {
       console.error('Registration failed:', err);
     } finally {
@@ -171,10 +195,7 @@ function EventDetails() {
               <i className="bi bi-geo-alt"></i> {event.venue}
             </p>
             <p className="event-info-meta">
-              <i className="bi bi-people"></i> {event.audience}
-            </p>
-            <p className="event-info-meta">
-              <i className="bi bi-people"></i> {event.organizer}
+              <i className="bi bi-people"></i> {event.targetAudience}
             </p>
 
             <hr className="event-divider" />
@@ -222,10 +243,16 @@ function EventDetails() {
           <div className="event-reg-card">
             <h5 className="event-reg-title">Event Registration</h5>
 
-            {submitted ? (
+            {event.status === 'registered' || event.status === 'waitlisted' || submitted ? (
               <div className="event-reg-success">
                 <i className="bi bi-check-circle-fill"></i>
-                <p>You have successfully registered for this event!</p>
+                <p>
+                  {submitted
+                    ? 'You have successfully submitted your registration!'
+                    : event.status === 'waitlisted'
+                    ? 'You are currently on the waitlist for this event.'
+                    : 'You are already registered for this event!'}
+                </p>
                 <button
                   className="btn btn-user-ticket mt-2"
                   onClick={() => navigate('/user/tickets')}
@@ -342,10 +369,10 @@ function EventDetails() {
                 <div className="event-reg-submit">
                   <button
                     type="submit"
-                    className="btn btn-reg-submit"
+                    className={event.status === 'full' ? "btn btn-user-waitlist w-100" : "btn btn-reg-submit"}
                     disabled={submitting}
                   >
-                    {submitting ? 'Registering...' : 'Register for this Event'}
+                    {submitting ? 'Registering...' : (event.status === 'full' ? 'Join Waitlist' : 'Register for this Event')}
                   </button>
                 </div>
               </form>

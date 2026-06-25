@@ -222,4 +222,108 @@ class EventController extends Controller
         // Logic to email PDF certificates to attendees
         return back()->with('success', 'E-Certificates are being sent to all attendees!');
     }
+
+    // --- STUDENT ENDPOINTS ---
+
+    public function studentDashboard()
+    {
+        $userId = Auth::id();
+        $eventsData = DB::table('events')
+            ->where('event_date', '>=', now()->toDateString())
+            ->where('status', 'published')
+            ->orderBy('event_date', 'asc')
+            ->get();
+
+        $formattedEvents = $eventsData->map(function ($event) use ($userId) {
+            $registeredCount = DB::table('tickets')
+                ->where('event_id', $event->id)
+                ->where('status', 'active')
+                ->count();
+            
+            $slotsLeft = $event->total_slots - $registeredCount;
+
+            $userTicket = DB::table('tickets')
+                ->where('event_id', $event->id)
+                ->where('user_id', $userId)
+                ->first();
+
+            $status = 'available';
+            if ($userTicket) {
+                if ($userTicket->status === 'active') {
+                    $status = 'registered';
+                } elseif ($userTicket->status === 'waitlisted') {
+                    $status = 'waitlisted'; // or custom
+                }
+            } elseif ($slotsLeft <= 0) {
+                $status = 'full';
+            } elseif ($slotsLeft <= 15) {
+                $status = 'slots_left';
+            }
+
+            return [
+                'id' => $event->id,
+                'title' => $event->title,
+                'category' => $event->category,
+                'date' => \Carbon\Carbon::parse($event->event_date)->format('D M d, Y \– g:i A'),
+                'venue' => $event->venue,
+                'totalSlots' => $event->total_slots,
+                'registeredCount' => $registeredCount,
+                'posterUrl' => null, // TODO: Use poster_path when available
+                'status' => $status,
+                'slotsLeft' => $slotsLeft > 0 ? $slotsLeft : 0,
+            ];
+        });
+
+        return response()->json([
+            'total' => $formattedEvents->count(),
+            'events' => $formattedEvents
+        ]);
+    }
+
+    public function studentShow($id)
+    {
+        $userId = Auth::id();
+        $event = DB::table('events')->where('id', $id)->first();
+        if (!$event) return response()->json(['error' => 'Event not found'], 404);
+
+        $registeredCount = DB::table('tickets')
+            ->where('event_id', $event->id)
+            ->where('status', 'active')
+            ->count();
+            
+        $slotsLeft = $event->total_slots - $registeredCount;
+        
+        $userTicket = DB::table('tickets')
+            ->where('event_id', $event->id)
+            ->where('user_id', $userId)
+            ->first();
+
+        $status = 'available';
+        if ($userTicket) {
+            $status = $userTicket->status === 'active' ? 'registered' : 'waitlisted';
+        } elseif ($slotsLeft <= 0) {
+            $status = 'full';
+        }
+
+        return response()->json([
+            'id' => $event->id,
+            'title' => $event->title,
+            'category' => $event->category,
+            'date' => \Carbon\Carbon::parse($event->event_date)->format('D M d, Y \– g:i A'),
+            'venue' => $event->venue,
+            'description' => $event->description,
+            'targetAudience' => $event->target_audience,
+            'totalSlots' => $event->total_slots,
+            'registeredCount' => $registeredCount,
+            'posterUrl' => null,
+            'status' => $status,
+            'slotsLeft' => $slotsLeft > 0 ? $slotsLeft : 0,
+        ]);
+    }
+
+    public function feedbackSubmit(Request $request, $event_id)
+    {
+        // For now, return simple success. In real app, insert into feedback table.
+        return response()->json(['success' => true, 'message' => 'Feedback submitted successfully!']);
+    }
 }

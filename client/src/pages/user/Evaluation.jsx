@@ -84,15 +84,16 @@ function EvaluationForm() {
   async function fetchEvent() {
     setLoading(true);
     try {
-      // TODO (backend): GET /feedback/{event_id}  (EventController@feedbackForm)
-      //
-      // const res = await fetch(`/feedback/${id}`, {
-      //   headers: { Accept: 'application/json' },
-      // });
-      // const data = await res.json();
-      // setEvent(data);
-
-      setEvent(MOCK_EVENT);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://127.0.0.1:8000/api/user/event/${id}`, {
+        headers: { 
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+      if (!res.ok) throw new Error('Failed to fetch event');
+      const data = await res.json();
+      setEvent(data);
     } catch (err) {
       console.error('Failed to fetch event:', err);
     } finally {
@@ -119,19 +120,18 @@ function EvaluationForm() {
 
     setSubmitting(true);
     try {
-      // TODO (backend): POST /feedback/submit  (EventController@feedbackSubmit)
-      //
-      // const res = await fetch('/feedback/submit', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     Accept: 'application/json',
-      //   },
-      //   body: JSON.stringify({ event_id: id, ...form }),
-      // });
-      // if (!res.ok) throw new Error('Submission failed');
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://127.0.0.1:8000/api/user/feedback/${id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ event_id: id, ...form }),
+      });
+      if (!res.ok) throw new Error('Submission failed');
 
-      console.log('Submitting evaluation:', { event_id: id, ...form });
       setSubmitted(true);
     } catch (err) {
       console.error('Submission failed:', err);

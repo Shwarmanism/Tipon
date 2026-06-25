@@ -70,17 +70,17 @@ function RegisteredEventDetails() {
   async function fetchTicket() {
     setLoading(true);
     try {
-      // TODO (backend): GET /ticket/{id}  (TicketController@showQR)
-      //
-      // const res = await fetch(`/ticket/${id}`, {
-      //   headers: { Accept: 'application/json' },
-      // });
-      // const data = await res.json();
-      // data.eventStartsAt = new Date(data.eventStartsAt);
-      // setTicket(data);
-
-      // Remove once API is connected:
-      setTicket(MOCK_TICKET);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://127.0.0.1:8000/api/user/ticket/${id}`, {
+        headers: { 
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+      if (!res.ok) throw new Error('Failed to fetch ticket');
+      const data = await res.json();
+      data.ticket.eventStartsAt = new Date(data.ticket.event.date); // Based on how event date is formatted
+      setTicket(data.ticket);
     } catch (err) {
       console.error('Failed to fetch ticket:', err);
     } finally {
@@ -92,14 +92,17 @@ function RegisteredEventDetails() {
     if (!confirm('Are you sure you want to cancel your registration?')) return;
     setCancelling(true);
     try {
-      // TODO (backend): GET /cancel/{id}  (TicketController@cancel)
-      //
-      // const res = await fetch(`/cancel/${id}`, {
-      //   headers: { Accept: 'application/json' },
-      // });
-      // if (!res.ok) throw new Error('Cancellation failed');
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://127.0.0.1:8000/api/user/cancel/${id}`, {
+        method: 'POST',
+        headers: { 
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+      if (!res.ok) throw new Error('Cancellation failed');
 
-      console.log('Cancelling registration for ticket:', id);
+      alert('Registration cancelled successfully.');
       navigate('/user/tickets');
     } catch (err) {
       console.error('Cancellation failed:', err);
@@ -169,10 +172,7 @@ function RegisteredEventDetails() {
               <i className="bi bi-geo-alt"></i> {event.venue}
             </p>
             <p className="event-info-meta">
-              <i className="bi bi-people"></i> {event.audience}
-            </p>
-            <p className="event-info-meta">
-              <i className="bi bi-people"></i> {event.organizer}
+              <i className="bi bi-people"></i> {event.targetAudience || event.target_audience}
             </p>
 
             <hr className="event-divider" />

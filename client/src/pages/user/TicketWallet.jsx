@@ -66,16 +66,16 @@ function TicketWallet() {
   async function fetchTickets() {
     setLoading(true);
     try {
-      // TODO (backend): GET /tickets  (TicketController@list)
-      //
-      // const res = await fetch('/tickets', {
-      //   headers: { Accept: 'application/json' },
-      // });
-      // const data = await res.json();
-      // setTickets(data);
-
-      // Remove once API is connected:
-      setTickets(MOCK_TICKETS);
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://127.0.0.1:8000/api/user/tickets', {
+        headers: { 
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+      if (!res.ok) throw new Error('Failed to fetch tickets');
+      const data = await res.json();
+      setTickets(data);
     } catch (err) {
       console.error('Failed to fetch tickets:', err);
     } finally {
@@ -86,15 +86,19 @@ function TicketWallet() {
   async function handleCancel(ticketId) {
     if (!confirm('Are you sure you want to cancel your registration?')) return;
     try {
-      // TODO (backend): GET /cancel/{id}  (TicketController@cancel)
-      //
-      // const res = await fetch(`/cancel/${ticketId}`, {
-      //   headers: { Accept: 'application/json' },
-      // });
-      // if (!res.ok) throw new Error('Cancellation failed');
-      // await fetchTickets();
-
-      console.log('Cancel ticket:', ticketId);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://127.0.0.1:8000/api/user/cancel/${ticketId}`, {
+        method: 'POST',
+        headers: { 
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Cancellation failed');
+      
+      alert(data.message);
+      await fetchTickets();
     } catch (err) {
       console.error('Cancellation failed:', err);
     }
