@@ -87,32 +87,35 @@ function CreateEvent() {
 
     setSubmitting(true);
     try {
-      // TODO (backend): POST to your Laravel endpoint
-      // Use FormData so the poster file is included
-      //
-      // const formData = new FormData();
-      // formData.append('title', form.title);
-      // formData.append('description', form.description);
-      // formData.append('category', form.category);
-      // formData.append('target_audience', form.targetAudience);
-      // formData.append('event_date', form.eventDate);
-      // formData.append('venue', form.venue);
-      // formData.append('start_time', form.startTime);
-      // formData.append('end_time', form.endTime);
-      // formData.append('total_slots', form.totalSlots);
-      // formData.append('status', status); // 'draft' or 'published'
-      // if (form.poster) formData.append('poster', form.poster);
-      //
-      // const res = await fetch('/event/submit', {
-      //   method: 'POST',
-      //   headers: { 'Accept': 'application/json' },
-      //   body: formData,
-      // });
-      // if (!res.ok) throw new Error('Failed to create event');
-      // navigate('/admin/dashboard');
+      const formData = new FormData();
+      formData.append('title', form.title);
+      formData.append('description', form.description);
+      formData.append('category', form.category);
+      formData.append('target_audience', form.targetAudience);
+      formData.append('event_date', form.eventDate);
+      formData.append('venue', form.venue);
+      formData.append('start_time', form.startTime);
+      formData.append('end_time', form.endTime);
+      formData.append('total_slots', form.totalSlots);
+      formData.append('status', status);
+      if (form.poster) formData.append('poster', form.poster);
 
-      // Remove this log once API is connected:
-      console.log('Submitting event:', { ...form, status });
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://127.0.0.1:8000/api/admin/event/submit', {
+        method: 'POST',
+        headers: { 
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        console.error('Validation errors:', data);
+        throw new Error('Failed to create event');
+      }
+
       navigate('/admin/dashboard');
     } catch (error) {
       console.error('Failed to create event:', error);

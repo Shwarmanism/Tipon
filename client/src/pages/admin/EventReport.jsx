@@ -57,28 +57,39 @@ function EventReport() {
   async function fetchReport() {
     setLoading(true);
     try {
-      // TODO (backend): fetch full report data from Laravel
-      // Expected shape:
-      // {
-      //   event:    { title, date, venue, organizedBy },
-      //   stats:    { totalRegistered, totalAttended, attendanceYield, noShows },
-      //   pieData:  [{ name, value }, ...],
-      //   barData:  [{ college, attendees }, ...],
-      //   manifest: [{ no, name, email, checkInTime, status }, ...],
-      // }
-      //
-      // const res = await fetch(`/report/${id}`);
-      // const data = await res.json();
-      // setEventInfo(data.event);
-      // setStats(data.stats);
-      // setPieData(data.pieData);
-      // setBarData(data.barData);
-      // setManifest(data.manifest);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://127.0.0.1:8000/api/admin/report/${id}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (!res.ok) throw new Error('Failed to fetch report');
+      const data = await res.json();
+      
+      const totalRegistered = data.totalRegistered || 0;
+      const totalAttended = data.totalAttended || 0;
+      const noShows = Math.max(0, totalRegistered - totalAttended);
+      const attendanceYield = totalRegistered > 0 ? Math.round((totalAttended / totalRegistered) * 100) : 0;
 
-      // Remove once API is connected:
-      setEventInfo(MOCK_EVENT_INFO);
-      setStats(MOCK_STATS);
-      setPieData(MOCK_PIE_DATA);
+      setEventInfo({
+        title: data.event.title,
+        date: data.event.event_date,
+        venue: data.event.venue,
+        organizedBy: 'Admin Portal',
+      });
+      
+      setStats({
+        totalRegistered,
+        totalAttended,
+        attendanceYield,
+        noShows,
+      });
+
+      setPieData([
+        { name: 'Attended', value: totalAttended },
+        { name: 'Did Not Show', value: noShows },
+      ]);
+
+      // Using mock for these until backend provides them
       setBarData(MOCK_BAR_DATA);
       setManifest(MOCK_MANIFEST);
     } catch (error) {

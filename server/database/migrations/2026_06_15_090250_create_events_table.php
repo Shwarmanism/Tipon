@@ -13,6 +13,17 @@ return new class extends Migration
     {
         Schema::create('events', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('creator_id')->constrained('users')->onDelete('cascade');
+            $table->string('title');
+            $table->text('description');
+            $table->string('category');
+            $table->string('target_audience')->nullable();
+            $table->date('event_date');
+            $table->time('start_time');
+            $table->time('end_time');
+            $table->string('venue');
+            $table->integer('total_slots');
+            $table->string('status')->default('draft');
             $table->timestamps();
         });
     }

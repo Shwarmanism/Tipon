@@ -39,24 +39,19 @@ function AdminDashboard() {
   async function fetchDashboardData() {
     setLoading(true);
     try {
-      // TODO (backend): replace URLs with your real Laravel API endpoints
-      // Expected shape for stats:
-      //   [{ label: string, value: number }, ...]
-      // Expected shape for events:
-      //   [{ id, title, category, date, venue, registrations, registrationPercent, status }, ...]
-
-      // const [statsRes, eventsRes] = await Promise.all([
-      //   fetch('/dashboard'),
-      //   fetch('/dashboard'),
-      // ]);
-      // const statsData = await statsRes.json();
-      // const eventsData = await eventsRes.json();
-      // setStats(statsData);
-      // setEvents(eventsData);
-
-      // Remove the two lines below once the API is connected:
-      setStats(MOCK_STATS);
-      setEvents(MOCK_EVENTS);
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://127.0.0.1:8000/api/admin/dashboard', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
+        }
+      });
+      
+      if (!res.ok) throw new Error('Failed to fetch dashboard data');
+      
+      const data = await res.json();
+      setStats(data.stats);
+      setEvents(data.events);
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
     } finally {
@@ -76,9 +71,19 @@ function AdminDashboard() {
     navigate(`/admin/events/${eventId}/edit`);
   }
 
-  function handleDelete(eventId) {
-    // TODO (backend): call DELETE /api/admin/events/:id then refetch
-    console.log('Delete event:', eventId);
+  async function handleDelete(eventId) {
+    if (!window.confirm('Are you sure you want to delete this event?')) return;
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://127.0.0.1:8000/api/admin/event/delete/${eventId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Failed to delete event');
+      fetchDashboardData();
+    } catch (error) {
+      console.error('Delete error:', error);
+    }
   }
 
   function handleCreateEvent() {
