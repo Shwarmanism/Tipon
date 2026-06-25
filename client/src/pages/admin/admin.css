@@ -860,6 +860,7 @@
 .admin-profile-page {
   padding: 2rem;
   max-width: 680px;
+  margin: 0 auto;
 }
 
 .admin-page-header {
