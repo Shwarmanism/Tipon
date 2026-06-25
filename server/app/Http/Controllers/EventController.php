@@ -29,17 +29,18 @@ class EventController extends Controller
 
     public function dashboard()
     {
-        $events = DB::table('events')
-                    ->where('creator_id', Auth::id())
-                    ->orderBy('event_date', 'asc')
-                    ->get();
+        // $events = DB::table('events')
+        //             ->where('creator_id', Auth::id())
+        //             ->orderBy('event_date', 'asc')
+        //             ->get();
 
-        return view('admin.dashboard', compact('events'));
+        // return view('admin.dashboard', compact('events'));
+        return view('admin.admin');
     }
 
     public function createForm()
     {
-        return view('admin.events.create');
+        return view('admin.create');
     }
 
     public function store(Request $request)
