@@ -18,7 +18,27 @@ class AttendanceController extends Controller
             return response()->json(['error' => 'Event not found'], 404);
         }
 
-        return response()->json(['event' => $event]);
+        // Fetch attendees for this event (only active and waitlisted, active first)
+        $attendees = DB::table('tickets')
+            ->join('users', 'tickets.user_id', '=', 'users.id')
+            ->leftJoin('attendances', 'tickets.id', '=', 'attendances.ticket_id')
+            ->where('tickets.event_id', $event_id)
+            ->whereIn('tickets.status', ['active', 'waitlisted'])
+            ->select(
+                'tickets.id',
+                'tickets.status',
+                'users.name',
+                'users.email as studentNo',
+                DB::raw('IF(attendances.id IS NOT NULL, true, false) as attended')
+            )
+            ->orderByRaw("FIELD(tickets.status, 'active', 'waitlisted')")
+            ->orderBy('users.name', 'asc')
+            ->get();
+
+        return response()->json([
+            'event' => $event,
+            'attendees' => $attendees
+        ]);
     }
 
     public function scanQrCode(Request $request)

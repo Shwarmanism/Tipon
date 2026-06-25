@@ -66,7 +66,7 @@ export default function Login() {
       if (data.user.role === 'admin') {
           navigate('/admin/dashboard');
       } else {
-          navigate('/'); // Student Bulletin Board
+          navigate('/user/dashboard'); // Student Bulletin Board
       }
 
     } catch (error) {
