@@ -15,10 +15,10 @@ class AttendanceController extends Controller
         $event = DB::table('events')->where('id', $event_id)->first();
         
         if (!$event) {
-            abort(404);
+            return response()->json(['error' => 'Event not found'], 404);
         }
 
-        return view('admin.attendance.scanner', compact('event'));
+        return response()->json(['event' => $event]);
     }
 
     public function scanQrCode(Request $request)
@@ -35,7 +35,7 @@ class AttendanceController extends Controller
                     ->first();
 
         if (!$ticket) {
-            return back()->with('error', 'Invalid QR Code or Ticket is inactive.');
+            return response()->json(['error' => 'Invalid QR Code or Ticket is inactive.'], 400);
         }
 
         $alreadyCheckedIn = DB::table('attendances')
@@ -43,7 +43,7 @@ class AttendanceController extends Controller
                               ->exists();
         
         if ($alreadyCheckedIn) {
-            return back()->with('warning', 'This ticket has already been scanned!');
+            return response()->json(['warning' => 'This ticket has already been scanned!'], 400);
         }
 
         DB::table('attendances')->insert([
@@ -54,7 +54,7 @@ class AttendanceController extends Controller
             'updated_at' => now(),
         ]);
 
-        return back()->with('success', 'Student successfully checked in!');
+        return response()->json(['success' => true, 'message' => 'Student successfully checked in!']);
     }
 
     public function manualCheckIn(Request $request)
@@ -68,7 +68,7 @@ class AttendanceController extends Controller
                               ->exists();
 
         if ($alreadyCheckedIn) {
-            return back()->with('warning', 'User is already checked in.');
+            return response()->json(['warning' => 'User is already checked in.'], 400);
         }
 
         DB::table('attendances')->insert([
@@ -79,6 +79,6 @@ class AttendanceController extends Controller
             'updated_at' => now(),
         ]);
 
-        return back()->with('success', 'Manual check-in successful.');
+        return response()->json(['success' => true, 'message' => 'Manual check-in successful.']);
     }
 }

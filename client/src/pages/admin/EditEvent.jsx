@@ -43,26 +43,25 @@ function EditEvent() {
 
   async function fetchEvent() {
     try {
-      // TODO (backend): fetch the existing event from Laravel
-      //
-      // const res = await fetch(`/event/edit/${id}`);
-      // const data = await res.json();
-      // setForm({
-      //   title: data.title,
-      //   description: data.description,
-      //   category: data.category,
-      //   targetAudience: data.target_audience,
-      //   eventDate: data.event_date,       // must be 'YYYY-MM-DD' for date input
-      //   venue: data.venue,
-      //   startTime: data.start_time,       // must be 'HH:MM' for time input
-      //   endTime: data.end_time,
-      //   totalSlots: String(data.total_slots),
-      //   poster: null,
-      //   posterPreview: data.poster_url ?? '',
-      // });
-
-      // Remove this once API is connected:
-      setForm(MOCK_EVENT);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://127.0.0.1:8000/api/admin/event/edit/${id}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Failed to fetch event');
+      const data = await res.json();
+      setForm({
+        title: data.event.title,
+        description: data.event.description,
+        category: data.event.category,
+        targetAudience: data.event.target_audience,
+        eventDate: data.event.event_date,       // must be 'YYYY-MM-DD' for date input
+        venue: data.event.venue,
+        startTime: data.event.start_time,       // must be 'HH:MM' for time input
+        endTime: data.event.end_time,
+        totalSlots: String(data.event.total_slots),
+        poster: null,
+        posterPreview: data.event.poster_url ?? '',
+      });
     } catch (error) {
       console.error('Failed to fetch event:', error);
     }
@@ -117,32 +116,34 @@ function EditEvent() {
 
     setSubmitting(true);
     try {
-      // TODO (backend): PUT/PATCH to Laravel endpoint
-      //
-      // const formData = new FormData();
-      // formData.append('_method', 'PUT'); // Laravel method spoofing
-      // formData.append('title', form.title);
-      // formData.append('description', form.description);
-      // formData.append('category', form.category);
-      // formData.append('target_audience', form.targetAudience);
-      // formData.append('event_date', form.eventDate);
-      // formData.append('venue', form.venue);
-      // formData.append('start_time', form.startTime);
-      // formData.append('end_time', form.endTime);
-      // formData.append('total_slots', form.totalSlots);
-      // formData.append('status', status);
-      // if (form.poster) formData.append('poster', form.poster);
-      //
-      // const res = await fetch(`/event/update/${id}`, {
-      //   method: 'POST', // POST with _method: PUT for FormData
-      //   headers: { 'Accept': 'application/json' },
-      //   body: formData,
-      // });
-      // if (!res.ok) throw new Error('Failed to update event');
-      // navigate('/admin/dashboard');
+      const formData = new FormData();
+      formData.append('_method', 'PUT'); // Laravel method spoofing
+      formData.append('title', form.title);
+      formData.append('description', form.description);
+      formData.append('category', form.category);
+      formData.append('target_audience', form.targetAudience);
+      formData.append('event_date', form.eventDate);
+      formData.append('venue', form.venue);
+      formData.append('start_time', form.startTime);
+      formData.append('end_time', form.endTime);
+      formData.append('total_slots', form.totalSlots);
+      formData.append('status', status);
+      if (form.poster) formData.append('poster', form.poster);
 
-      // Remove this log once API is connected:
-      console.log('Updating event:', { id, ...form, status });
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://127.0.0.1:8000/api/admin/event/update/${id}`, {
+        method: 'POST', // POST with _method: PUT for FormData
+        headers: { 
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: formData,
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error('Validation errors:', errorData);
+        throw new Error('Failed to update event');
+      }
       navigate('/admin/dashboard');
     } catch (error) {
       console.error('Failed to update event:', error);

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './auth.css';
 
 // ─── Role options (keep in sync with backend) ─────────────────────────────────
@@ -18,6 +18,7 @@ const EMPTY_FORM = {
 };
 
 export default function Register() {
+  const navigate                      = useNavigate();
   const [form, setForm]               = useState(EMPTY_FORM);
   const [showPassword, setShowPassword]           = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -51,30 +52,35 @@ export default function Register() {
 
     setSubmitting(true);
     try {
-      // TODO (backend): POST to Laravel register endpoint
-      //
-      // const res = await fetch('/api/register', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'Accept': 'application/json',
-      //   },
-      //   body: JSON.stringify({
-      //     name:                  form.name,
-      //     email:                 form.email,
-      //     role:                  form.role,
-      //     password:              form.password,
-      //     password_confirmation: form.password_confirmation,
-      //   }),
-      // });
-      // if (!res.ok) {
-      //   const data = await res.json();
-      //   setErrors(data.errors ?? {});
-      //   return;
-      // }
-      // navigate('/login');
+      const res = await fetch('http://127.0.0.1:8000/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          name:                  form.name,
+          email:                 form.email,
+          role:                  form.role,
+          password:              form.password,
+          password_confirmation: form.password_confirmation,
+        }),
+      });
 
-      console.log('Register:', form);
+      if (!res.ok) {
+        const data = await res.json();
+        setErrors(data.errors ?? { email: 'Registration failed. Check your inputs.' });
+        return;
+      }
+
+      const data = await res.json();
+      localStorage.setItem('token', data.token);
+
+      if (data.user.role === 'admin') {
+          navigate('/admin/dashboard');
+      } else {
+          navigate('/');
+      }
     } catch (error) {
       console.error('Registration failed:', error);
     } finally {

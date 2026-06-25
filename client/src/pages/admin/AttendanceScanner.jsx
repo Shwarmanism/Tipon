@@ -37,17 +37,17 @@ function AttendanceScanner() {
   // ─── Fetch event details for the info bar ─────────────────────────────────
   async function fetchEventInfo() {
     try {
-      // TODO (backend): fetch event details from Laravel
-      //
-      // const res = await fetch(`/api/admin/events/${id}`);
-      // const data = await res.json();
-      // setEventInfo({
-      //   title: data.title,
-      //   date: data.date,
-      //   venue: data.venue,
-      // });
-
-      setEventInfo(MOCK_EVENT_INFO);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://127.0.0.1:8000/api/admin/checkin/${id}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Failed to fetch event info');
+      const data = await res.json();
+      setEventInfo({
+        title: data.event.title,
+        date: data.event.event_date,
+        venue: data.event.venue,
+      });
     } catch (error) {
       console.error('Failed to fetch event info:', error);
     }
@@ -100,13 +100,20 @@ function AttendanceScanner() {
   // ─── Mark attended ────────────────────────────────────────────────────────
   async function handleMarkAttended(attendeeId) {
     try {
-      // TODO (backend): POST to mark attendee as attended
-      //
-      // const res = await fetch(
-      //   `/checkin/manual`,
-      //   { method: 'POST', headers: { 'Accept': 'application/json' } }
-      // );
-      // if (!res.ok) throw new Error('Failed to mark attended');
+      const token = localStorage.getItem('token');
+      const res = await fetch(
+        `http://127.0.0.1:8000/api/admin/checkin/manual`,
+        { 
+          method: 'POST', 
+          headers: { 
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ ticket_id: attendeeId })
+        }
+      );
+      if (!res.ok) throw new Error('Failed to mark attended');
 
       // Optimistic UI update:
       const update = (list) =>
@@ -119,17 +126,28 @@ function AttendanceScanner() {
   }
 
   // ─── QR scan result handler (called by scanner library) ──────────────────
-  function handleQRScan(scannedData) {
-    // TODO (backend): scannedData is the decoded QR string (e.g. student number or token)
-    // POST it to the backend to validate and mark attendance
-    //
-    // await fetch(`/api/admin/events/${id}/scan`, {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    //   body: JSON.stringify({ qr_data: scannedData }),
-    // });
-
-    console.log('QR scanned:', scannedData);
+  async function handleQRScan(scannedData) {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://127.0.0.1:8000/api/admin/checkin/scan`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json', 
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ qr_code_uuid: scannedData, event_id: id }),
+      });
+      if (!res.ok) throw new Error('Failed to scan QR code');
+      console.log('QR scanned successfully:', scannedData);
+      
+      // Update UI if needed (for now just optimistic update if it was in the list)
+      const update = (list) =>
+        list.map((a) => (a.studentNo === scannedData ? { ...a, attended: true, status: 'attended' } : a));
+      setAttendees((prev) => update(prev));
+    } catch (error) {
+      console.error('QR scan error:', error);
+    }
   }
 
   // ─── Status badge ─────────────────────────────────────────────────────────
