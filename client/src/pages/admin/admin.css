@@ -727,3 +727,36 @@
   color: #2e7d52;
   font-weight: 500;
 }
+
+/* ─── Event Report ─── */
+.report-yield { color: #e8611a !important; }
+
+.report-chart-card {
+  background-color: #ffffff;
+  border: 1px solid #eeebe6;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  height: 100%;
+}
+
+.report-chart-title {
+  font-size: 0.82rem;
+  color: #888;
+  margin-bottom: 1rem;
+}
+
+.report-header-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.report-chart-placeholder {
+  height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #bbb;
+  font-size: 0.875rem;
+}

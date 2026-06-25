@@ -69,8 +69,7 @@ function AdminDashboard() {
   }
 
   function handleReport(eventId) {
-    // TODO (backend): navigate to report page for this event
-    console.log('Report event:', eventId);
+    navigate(`/admin/events/${eventId}/report`);
   }
 
   function handleEdit(eventId) {
