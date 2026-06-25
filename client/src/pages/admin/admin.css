@@ -2,7 +2,7 @@
 .admin-wrapper {
   display: flex;
   min-height: 100vh;
-  background-color: #faf9f7;
+  background-color: #FFFCFA;
 }
 
 .admin-main {
@@ -22,7 +22,7 @@
   width: 240px;
   min-width: 240px;
   background-color: #ffffff;
-  border-right: 1px solid #eeebe6;
+  border-right: 1px solid #d8e3dc;
   display: flex;
   flex-direction: column;
   padding: 1.25rem 0;
@@ -81,12 +81,12 @@
 }
 
 .sidebar-link:hover {
-  background-color: #fdf0e8;
+  background-color: #EAF8F0;
   color: #e8611a;
 }
 
 .sidebar-link.active {
-  background-color: #fdf0e8;
+  background-color: #EAF8F0;
   color: #e8611a;
   font-weight: 600;
 }
@@ -127,7 +127,7 @@
 
 .user-role {
   font-size: 0.72rem;
-  color: #999;
+  color: #6B8074;
 }
 
 .sidebar-user-menu {
@@ -178,12 +178,12 @@
 .admin-page-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #5C4A42;
 }
 
 .admin-page-subtitle {
   font-size: 0.875rem;
-  color: #999;
+  color: #6B8074;
 }
 
 /* ─── Create Event Button ─────────────────────────────── */
@@ -226,7 +226,7 @@
 .stat-value {
   font-size: 2rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #5C4A42;
   margin: 0.5rem 0 0.25rem;
 }
 
@@ -275,7 +275,7 @@
 
 .event-title-cell {
   font-weight: 500;
-  color: #1a1a1a;
+  color: #5C4A42;
   max-width: 180px;
 }
 
@@ -492,7 +492,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #999;
+  color: #6B8074;
   font-size: 0.875rem;
 }
 
@@ -657,7 +657,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  color: #999;
+  color: #6B8074;
   font-size: 0.875rem;
 }
 
@@ -774,7 +774,7 @@
 
 .report-chart-title {
   font-size: 0.82rem;
-  color: #888;
+  color: #6B8074;
   margin-bottom: 1rem;
 }
 
@@ -852,7 +852,7 @@
 
 .admin-event-card-meta {
   font-size: 0.8rem;
-  color: #888;
+  color: #6B8074;
   margin-bottom: 0.2rem;
 }
 
