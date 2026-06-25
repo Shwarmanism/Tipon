@@ -18,6 +18,7 @@ import CreateEvent from './pages/admin/CreateEvent';
 import EditEvent from './pages/admin/EditEvent';
 import AttendanceScanner from './pages/admin/AttendanceScanner';
 import EventReport from './pages/admin/EventReport';
+import AdminEvents from './pages/admin/AdminEvents';
 
 import NotFound from './pages/NotFound';
 
@@ -53,6 +54,7 @@ function App() {
           <Route path="events/:id/edit" element={<EditEvent />} />
           <Route path="events/:id/scan" element={<AttendanceScanner />} />
           <Route path="events/:id/report" element={<EventReport />} />
+          <Route path="events" element={<AdminEvents />} />
         </Route>
 
         {/* Fallback */}

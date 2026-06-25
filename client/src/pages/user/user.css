@@ -334,6 +334,138 @@
   color: #fff;
 }
 
+
+/* ─── QR Clickable wrapper ─────────────────────────────── */
+.ticket-qr-clickable {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.ticket-qr-zoom-hint {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  border-radius: 5px;
+  padding: 2px 5px;
+  font-size: 0.75rem;
+}
+
+/* ─── QR Modal ─────────────────────────────────────────── */
+.qr-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.qr-modal-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  width: 340px;
+  text-align: center;
+  position: relative;
+}
+
+.qr-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.qr-modal-close:hover { color: #333; }
+
+.qr-modal-title {
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 0.25rem;
+}
+
+.qr-modal-code {
+  font-size: 0.8rem;
+  color: #aaa;
+  margin-bottom: 1rem;
+}
+
+.qr-modal-img {
+  width: 220px;
+  height: 220px;
+  object-fit: contain;
+  margin-bottom: 1rem;
+}
+
+.qr-modal-placeholder {
+  width: 220px;
+  height: 220px;
+  background: #f5f5f5;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.qr-modal-placeholder-icon {
+  font-size: 5rem;
+  color: #ccc;
+}
+
+.qr-modal-hint {
+  font-size: 0.78rem;
+  color: #888;
+  margin-bottom: 0;
+}
+
+/* ─── Registered card body layout ─────────────────────── */
+.user-card-body--registered {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-card-body-info {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ─── Blurred QR on dashboard card ────────────────────── */
+.user-card-qr-preview {
+  position: relative;
+  flex-shrink: 0;
+  cursor: pointer;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.user-card-qr-blur {
+  filter: blur(3px);
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.user-card-qr-hint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e8611a;
+  font-size: 1.1rem;
+  background: rgba(255,255,255,0.3);
+}
+
 /* ─── Footer ───────────────────────────────────────────── */
 .user-footer {
   text-align: center;
@@ -1360,4 +1492,28 @@
 .eval-submitted p {
   font-size: 0.9rem;
   color: #888;
+}
+
+.user-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: .875rem;
+  color: #dc3545;
+  border: 1px solid #dc3545;
+  border-radius: 6px;
+  background: transparent;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background .15s, color .15s;
+}
+
+.user-logout-btn:hover {
+  background: #dc3545;
+  color: #fff;
+}
+
+.user-logout-btn i {
+  font-size: 1rem;
 }

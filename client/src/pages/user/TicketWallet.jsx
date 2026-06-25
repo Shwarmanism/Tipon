@@ -1,16 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './user.css';
+import { QRCodeSVG as QRCode } from 'qrcode.react';
 
 // ─── Mock Data (replace with real API response) ────────────────────────────
-// Expected shape from GET /tickets (TicketController@list):
-// [
-//   {
-//     id, ticketCode, qrUrl,
-//     status: 'active' | 'waitlisted' | 'attended',
-//     event: { id, title, date, venue }
-//   }
-// ]
 const MOCK_TICKETS = [
   {
     id: 1,
@@ -55,9 +48,10 @@ const TABS = ['all', 'active', 'waitlisted', 'attended'];
 
 function TicketWallet() {
   const navigate = useNavigate();
-  const [tickets, setTickets] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('all');
+  const [tickets, setTickets]       = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [activeTab, setActiveTab]   = useState('all');
+  const [qrModal, setQrModal]       = useState(null); // { qrUrl, ticketCode, eventTitle }
 
   useEffect(() => {
     fetchTickets();
@@ -68,9 +62,9 @@ function TicketWallet() {
     try {
       const token = localStorage.getItem('token');
       const res = await fetch('http://127.0.0.1:8000/api/user/tickets', {
-        headers: { 
+        headers: {
           'Accept': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
         },
       });
       if (!res.ok) throw new Error('Failed to fetch tickets');
@@ -78,6 +72,8 @@ function TicketWallet() {
       setTickets(data);
     } catch (err) {
       console.error('Failed to fetch tickets:', err);
+      // Remove once API is connected:
+      setTickets(MOCK_TICKETS);
     } finally {
       setLoading(false);
     }
@@ -89,14 +85,13 @@ function TicketWallet() {
       const token = localStorage.getItem('token');
       const res = await fetch(`http://127.0.0.1:8000/api/user/cancel/${ticketId}`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Accept': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
         },
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Cancellation failed');
-      
       alert(data.message);
       await fetchTickets();
     } catch (err) {
@@ -105,7 +100,6 @@ function TicketWallet() {
   }
 
   function handleEvaluate(eventId) {
-    // TODO (backend): GET /feedback/{event_id}  (EventController@feedbackForm)
     navigate(`/user/evaluation/${eventId}`);
   }
 
@@ -113,18 +107,30 @@ function TicketWallet() {
     navigate(`/user/tickets/${ticketId}`);
   }
 
-  // Tab counts
+  // ─── QR Modal ─────────────────────────────────────────────────────────────
+  function openQrModal(e, ticket) {
+    e.stopPropagation();
+    setQrModal({
+      qrUrl:       ticket.qrUrl,
+      ticketCode:  ticket.ticketCode,
+      eventTitle:  ticket.event.title,
+    });
+  }
+
+  function closeQrModal() {
+    setQrModal(null);
+  }
+
+  // ─── Tab helpers ──────────────────────────────────────────────────────────
   function countByStatus(status) {
     return tickets.filter((t) => t.status === status).length;
   }
 
-  // Filtered list
   const filtered =
     activeTab === 'all'
       ? tickets
       : tickets.filter((t) => t.status === activeTab);
 
-  // Tab label helper
   function tabLabel(tab) {
     if (tab === 'all') return `All (${tickets.length})`;
     return `${tab.charAt(0).toUpperCase() + tab.slice(1)} (${countByStatus(tab)})`;
@@ -188,7 +194,7 @@ function TicketWallet() {
                 </p>
               </div>
 
-              {/* QR Code area */}
+              {/* QR Code area — click to open modal */}
               <div
                 className="ticket-card-qr"
                 onClick={(e) => e.stopPropagation()}
@@ -203,19 +209,35 @@ function TicketWallet() {
                     </div>
                   </div>
                 ) : ticket.qrUrl ? (
-                  <img
-                    src={ticket.qrUrl}
-                    alt="QR Code"
-                    className="ticket-card-qr-img"
-                  />
+                  <div
+                    className="ticket-qr-clickable"
+                    onClick={(e) => openQrModal(e, ticket)}
+                    title="Click to enlarge"
+                  >
+                    <img
+                      src={ticket.qrUrl}
+                      alt="QR Code"
+                      className="ticket-card-qr-img"
+                    />
+                    <div className="ticket-qr-zoom-hint">
+                      <i className="bi bi-zoom-in"></i>
+                    </div>
+                  </div>
                 ) : (
-                  <div className="ticket-card-qr-placeholder">
+                  <div
+                    className="ticket-card-qr-placeholder ticket-qr-clickable"
+                    onClick={(e) => openQrModal(e, ticket)}
+                    title="Click to enlarge"
+                  >
                     <i className="bi bi-qr-code"></i>
+                    <div className="ticket-qr-zoom-hint">
+                      <i className="bi bi-zoom-in"></i>
+                    </div>
                   </div>
                 )}
               </div>
 
-              {/* Ticket code (not shown for waitlisted) */}
+              {/* Ticket code */}
               {ticket.status !== 'waitlisted' && (
                 <p className="ticket-card-code">{ticket.ticketCode}</p>
               )}
@@ -225,15 +247,7 @@ function TicketWallet() {
                 className="ticket-card-actions"
                 onClick={(e) => e.stopPropagation()}
               >
-                {ticket.status === 'active' && (
-                  <button
-                    className="btn btn-ticket-cancel"
-                    onClick={() => handleCancel(ticket.id)}
-                  >
-                    Cancel Registration
-                  </button>
-                )}
-                {ticket.status === 'waitlisted' && (
+                {(ticket.status === 'active' || ticket.status === 'waitlisted') && (
                   <button
                     className="btn btn-ticket-cancel"
                     onClick={() => handleCancel(ticket.id)}
@@ -255,6 +269,42 @@ function TicketWallet() {
           ))}
         </div>
       )}
+
+      {/* ── QR Modal ──────────────────────────────────────────────────────── */}
+      {qrModal && (
+        <div className="qr-modal-overlay" onClick={closeQrModal}>
+          <div className="qr-modal-card" onClick={(e) => e.stopPropagation()}>
+
+            <button className="qr-modal-close" onClick={closeQrModal}>
+              <i className="bi bi-x-lg"></i>
+            </button>
+
+            <h6 className="qr-modal-title">{qrModal.eventTitle}</h6>
+            <p className="qr-modal-code">{qrModal.ticketCode}</p>
+
+            {/* QR image or placeholder */}
+            {qrModal.qrUrl ? (
+              <img
+                src={qrModal.qrUrl}
+                alt="QR Code"
+                className="qr-modal-img"
+              />
+            ) : (
+              <div className="qr-modal-placeholder">
+                <i className="bi bi-qr-code qr-modal-placeholder-icon"></i>
+                <p className="text-muted small mt-2">QR code will appear here</p>
+              </div>
+            )}
+
+            <p className="qr-modal-hint">
+              <i className="bi bi-info-circle me-1"></i>
+              Show this QR code to the scanner at the venue entrance.
+            </p>
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
