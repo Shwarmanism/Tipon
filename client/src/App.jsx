@@ -4,6 +4,14 @@ import AuthLayout from './components/AuthLayout';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 
+import UserLayout from './pages/user/UserLayout';
+import UserDashboard from './pages/user/UserDashboard';
+import EventDetails from './pages/user/EventDetails';
+import RegisteredEvents from './pages/user/RegisteredEvents';
+import TicketWallet from './pages/user/TicketWallet';
+import UserProfile from './pages/user/UserProfile';
+import Evaluation from './pages/user/Evaluation';
+
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import CreateEvent from './pages/admin/CreateEvent';
@@ -25,6 +33,16 @@ function App() {
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+        </Route>
+
+        {/* User routes */}
+        <Route path="/user" element={<UserLayout />}>
+          <Route path="dashboard" element={<UserDashboard />} />
+          <Route path="events/:id" element={<EventDetails />} />
+          <Route path="registered" element={<RegisteredEvents />} />
+          <Route path="tickets" element={<TicketWallet />} />
+          <Route path="profile" element={<UserProfile />} />
+          <Route path="evaluation/:id" element={<Evaluation />} />  
         </Route>
 
         {/* Admin routes */}
