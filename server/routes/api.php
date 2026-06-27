@@ -40,6 +40,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/profile/password', [AuthController::class, 'updatePassword']);
 
         // Event Lifecycle Management
+        Route::get('/events/published', [EventController::class, 'adminEvents']);
         Route::get('/event/add', [EventController::class, 'createForm']);
         Route::post('/event/submit', [EventController::class, 'store']);
         Route::get('/event/edit/{id}', [EventController::class, 'editEvent']);
@@ -53,6 +54,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Comprehensive Event Reports 
         Route::get('/report/{event_id}', [EventController::class, 'reportYield']); 
+        Route::post('/events/{event_id}/export/certificates', [EventController::class, 'exportCertificates']);
+        Route::get('/events/{event_id}/export/csv', [EventController::class, 'exportCSV']);
+        Route::get('/events/{event_id}/export/excel', [EventController::class, 'exportExcel']);
         Route::get('/export/{event_id}', [EventController::class, 'exportManifest']);
         
         // E-Certificates

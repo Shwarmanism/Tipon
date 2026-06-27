@@ -40,6 +40,91 @@ const MOCK_MANIFEST = [
 
 const PIE_COLORS = ['#e8611a', '#e0ddd8'];
 
+function CertificateConfigModal({ onClose, onSubmit }) {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    onSubmit(formData);
+  };
+
+  return (
+    <div className="modal-backdrop-custom" onClick={onClose}>
+      <div
+        className="modal-box-custom"
+        onClick={(e) => e.stopPropagation()}
+        style={{ maxWidth: '550px', textAlign: 'left', padding: '2rem' }}
+      >
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h4 className="modal-box-title mb-0" style={{ color: '#e8611a' }}>E-Certificate Configuration</h4>
+          <button className="btn-close" onClick={onClose} style={{ fontSize: '0.8rem' }}></button>
+        </div>
+        
+        <p className="modal-box-body">
+          Provide the names and upload the digital signatures (transparent PNGs recommended) for the signatories to be printed on the certificates.
+        </p>
+
+        <form onSubmit={handleSubmit}>
+          
+          <div className="mb-4">
+            <h6 style={{ fontWeight: '600', color: '#555', borderBottom: '1px solid #eeebe6', paddingBottom: '0.5rem', marginBottom: '1rem' }}>
+              <i className="bi bi-person-badge me-2"></i>Organization Head
+            </h6>
+            <div className="row g-3">
+              <div className="col-md-6">
+                <label className="form-label text-muted" style={{ fontSize: '0.8rem' }}>Name</label>
+                <input type="text" name="org_head_name" placeholder="e.g. John Doe" required className="form-control" />
+              </div>
+              <div className="col-md-6">
+                <label className="form-label text-muted" style={{ fontSize: '0.8rem' }}>Signature Image</label>
+                <input type="file" name="org_head_signature" accept="image/*" required className="form-control" />
+              </div>
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <h6 style={{ fontWeight: '600', color: '#555', borderBottom: '1px solid #eeebe6', paddingBottom: '0.5rem', marginBottom: '1rem' }}>
+              <i className="bi bi-person-workspace me-2"></i>TIPON Coordinator
+            </h6>
+            <div className="row g-3">
+              <div className="col-md-6">
+                <label className="form-label text-muted" style={{ fontSize: '0.8rem' }}>Name</label>
+                <input type="text" name="tipon_coord_name" placeholder="e.g. Jane Smith" required className="form-control" />
+              </div>
+              <div className="col-md-6">
+                <label className="form-label text-muted" style={{ fontSize: '0.8rem' }}>Signature Image</label>
+                <input type="file" name="tipon_coord_signature" accept="image/*" required className="form-control" />
+              </div>
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <h6 style={{ fontWeight: '600', color: '#555', borderBottom: '1px solid #eeebe6', paddingBottom: '0.5rem', marginBottom: '1rem' }}>
+              <i className="bi bi-person-rolodex me-2"></i>Event Head
+            </h6>
+            <div className="row g-3">
+              <div className="col-md-6">
+                <label className="form-label text-muted" style={{ fontSize: '0.8rem' }}>Name</label>
+                <input type="text" name="event_head_name" placeholder="e.g. Juan Dela Cruz" required className="form-control" />
+              </div>
+              <div className="col-md-6">
+                <label className="form-label text-muted" style={{ fontSize: '0.8rem' }}>Signature Image</label>
+                <input type="file" name="event_head_signature" accept="image/*" required className="form-control" />
+              </div>
+            </div>
+          </div>
+
+          <div className="modal-box-actions mt-4 d-flex justify-content-end gap-2">
+            <button type="button" className="btn-modal-cancel" onClick={onClose}>Cancel</button>
+            <button type="submit" className="btn btn-create-event" style={{ padding: '0.5rem 1.5rem', fontSize: '0.9rem' }}>
+              <i className="bi bi-cloud-arrow-down me-2"></i>Generate & Download
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 function EventReport() {
   const { id } = useParams(); // expects route: /admin/events/:id/report
 
@@ -49,6 +134,7 @@ function EventReport() {
   const [barData, setBarData]       = useState(MOCK_BAR_DATA);
   const [manifest, setManifest]     = useState(MOCK_MANIFEST);
   const [loading, setLoading]       = useState(false);
+  const [showCertModal, setShowCertModal] = useState(false);
 
   useEffect(() => {
     fetchReport();
@@ -59,34 +145,26 @@ function EventReport() {
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(`http://127.0.0.1:8000/api/admin/report/${id}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
       });
       
       if (!res.ok) throw new Error('Failed to fetch report');
       const data = await res.json();
       
-      const totalRegistered = data.totalRegistered || 0;
-      const totalAttended = data.totalAttended || 0;
-      const noShows = Math.max(0, totalRegistered - totalAttended);
-      const attendanceYield = totalRegistered > 0 ? Math.round((totalAttended / totalRegistered) * 100) : 0;
-
-      setEventInfo({
-        title: data.event.title,
-        date: data.event.event_date,
-        venue: data.event.venue,
-        organizedBy: 'Admin Portal',
-      });
-      
+      setEventInfo(data.event || MOCK_EVENT_INFO);
       setStats({
-        totalRegistered,
-        totalAttended,
-        attendanceYield,
-        noShows,
+        totalRegistered: data.totalRegistered || 0,
+        totalAttended: data.totalAttended || 0,
+        attendanceYield: data.totalRegistered ? Math.round((data.totalAttended / data.totalRegistered) * 100) : 0,
+        noShows: (data.totalRegistered || 0) - (data.totalAttended || 0),
       });
 
       setPieData([
-        { name: 'Attended', value: totalAttended },
-        { name: 'Did Not Show', value: noShows },
+        { name: 'Attended', value: data.totalAttended || 0 },
+        { name: 'Did Not Show', value: (data.totalRegistered || 0) - (data.totalAttended || 0) },
       ]);
 
       // Using mock for this chart until backend provides them
@@ -100,19 +178,73 @@ function EventReport() {
   }
 
   // ─── Action handlers ───────────────────────────────────────────────────────
-  function handleDistributeCertificates() {
-    // TODO (backend): POST /api/admin/events/:id/certificates
-    console.log('Distribute e-certificates for event:', id);
+  async function handleDistributeCertificates(formData) {
+    try {
+      setShowCertModal(false);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://127.0.0.1:8000/api/admin/events/${id}/export/certificates`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      });
+      if (!res.ok) throw new Error('Failed to generate certificates');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `certificates_event_${id}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error distributing certificates:', error);
+      alert('Failed to distribute certificates. Please try again later.');
+    }
   }
 
-  function handleExportExcel() {
-    // TODO (backend): GET /api/admin/events/:id/report/export?format=xlsx
-    console.log('Export Excel for event:', id);
+  async function handleExportExcel() {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://127.0.0.1:8000/api/admin/events/${id}/export/excel`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Failed to export Excel');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `event_${id}_manifest.xls`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error exporting Excel:', error);
+      alert('Failed to export Excel.');
+    }
   }
 
-  function handleExportCSV() {
-    // TODO (backend): GET /api/admin/events/:id/report/export?format=csv
-    console.log('Export CSV for event:', id);
+  async function handleExportCSV() {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://127.0.0.1:8000/api/admin/events/${id}/export/csv`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Failed to export CSV');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `event_${id}_manifest.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error exporting CSV:', error);
+      alert('Failed to export CSV.');
+    }
   }
 
   // ─── Status badge ──────────────────────────────────────────────────────────
@@ -128,7 +260,12 @@ function EventReport() {
 
   return (
     <div className="admin-content">
-
+      {showCertModal && (
+        <CertificateConfigModal 
+          onClose={() => setShowCertModal(false)} 
+          onSubmit={handleDistributeCertificates} 
+        />
+      )}
       {/* ── Header ──────────────────────────────────────────────────────── */}
       <div className="d-flex justify-content-between align-items-start mb-4">
         <div>
@@ -138,7 +275,7 @@ function EventReport() {
           </p>
         </div>
         <div className="report-header-actions">
-          <button className="btn btn-action-outline" onClick={handleDistributeCertificates}>
+          <button className="btn btn-action-outline" onClick={() => setShowCertModal(true)}>
             <i className="bi bi-award me-2"></i>Distribute E-Certificates
           </button>
           <button className="btn btn-action-outline" onClick={handleExportExcel}>
