@@ -187,7 +187,10 @@ function EventReport() {
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData
       });
-      if (!res.ok) throw new Error('Failed to generate certificates');
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || 'Failed to generate certificates');
+      }
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -199,7 +202,7 @@ function EventReport() {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error distributing certificates:', error);
-      alert('Failed to distribute certificates. Please try again later.');
+      alert(error.message || 'Failed to distribute certificates. Please try again later.');
     }
   }
 

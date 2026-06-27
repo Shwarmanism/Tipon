@@ -351,7 +351,7 @@ class EventController extends Controller
             $textWidth = $bbox[2] - $bbox[0];
             $textHeight = $bbox[1] - $bbox[7];
             $x = ($imageWidth - $textWidth) / 2;
-            $nameY = ($imageHeight / 2) - 30; // Slightly above center
+            $nameY = ($imageHeight / 2) + 85; // Adjusted down to sit on the horizontal line
             imagettftext($image, $fontSize, 0, $x, $nameY, $primaryColor, $fontPath, $text);
 
             // 2. Draw paragraph with event name
@@ -379,7 +379,7 @@ class EventController extends Controller
                 $lines[] = trim($currentLine);
             }
 
-            $pY = $nameY + 120; // Start below the student name (accounting for the line separator in the template)
+            $pY = $nameY + 80; // Start comfortably below the horizontal line
             $lineHeight = 45;
             foreach ($lines as $line) {
                 $bbox = imagettfbbox($pFontSize, 0, $nameFontPath, $line);
@@ -389,26 +389,26 @@ class EventController extends Controller
                 $pY += $lineHeight;
             }
 
-            // Helper to draw signature and name
             $drawSignature = function ($img, $sigImg, $name, $centerX) use ($imageHeight, $nameFontPath, $primaryColor) {
-                // Place signature right above the bottom text area
-                $sigY = $imageHeight - 280; 
                 if ($sigImg) {
                     $sigW = imagesx($sigImg);
                     $sigH = imagesy($sigImg);
                     // Target width 220px for signatures
                     $targetW = 220;
                     $targetH = ($sigH / $sigW) * $targetW;
+                    
+                    // Place signature dynamically above the typed name
+                    $sigY = ($imageHeight - 220) - $targetH;
                     $sigX = $centerX - ($targetW / 2);
                     imagecopyresampled($img, $sigImg, $sigX, $sigY, 0, 0, $targetW, $targetH, $sigW, $sigH);
                 }
 
-                // Draw name directly below the signature, matching the template's color
+                // Draw name directly below the signature, resting on the template line
                 $nameSize = 22;
                 $bbox = imagettfbbox($nameSize, 0, $nameFontPath, $name);
                 $nameW = $bbox[2] - $bbox[0];
                 $nameX = $centerX - ($nameW / 2);
-                $nameY = $imageHeight - 160; 
+                $nameY = $imageHeight - 195; // Adjusted to sit above the title text
                 imagettftext($img, $nameSize, 0, $nameX, $nameY, $primaryColor, $nameFontPath, $name);
             };
 
