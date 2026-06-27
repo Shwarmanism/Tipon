@@ -43,12 +43,69 @@ const MOCK_EVENTS = [
 ];
 // ─────────────────────────────────────────────────────────────────────────────
 
+function QuickViewModal({ event, onClose }) {
+  if (!event) return null;
+  return (
+    <div className="modal-backdrop-custom" onClick={onClose} style={{ zIndex: 1050 }}>
+      <div
+        className="modal-box-custom"
+        onClick={(e) => e.stopPropagation()}
+        style={{ maxWidth: '600px', width: '90%' }}
+      >
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h4 className="mb-0">{event.title}</h4>
+          <button className="btn-close" onClick={onClose}></button>
+        </div>
+        
+        {event.posterUrl && (
+          <img 
+            src={event.posterUrl} 
+            alt={event.title} 
+            style={{ width: '100%', maxHeight: '300px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem' }}
+          />
+        )}
+        
+        <div className="mb-3">
+          <strong><i className="bi bi-calendar3 me-2"></i>Date:</strong> {event.date} <br/>
+          <strong><i className="bi bi-geo-alt me-2"></i>Venue:</strong> {event.venue} <br/>
+          <strong><i className="bi bi-tag me-2"></i>Category:</strong> {event.category}
+        </div>
+        
+        <div className="mb-3">
+          <strong>Description:</strong>
+          <p className="mt-1" style={{ whiteSpace: 'pre-wrap', color: '#555' }}>
+            {event.description || 'No description provided.'}
+          </p>
+        </div>
+        
+        {event.targetAudience && (
+          <div className="mb-4">
+            <strong>Target Audience:</strong> {event.targetAudience}
+          </div>
+        )}
+
+        <div className="alert alert-info d-flex align-items-center" role="alert">
+          <i className="bi bi-info-circle-fill me-2"></i>
+          <div>
+            <strong>Registration Notice:</strong> To register for this event, please log in using a <strong>Student Account</strong>.
+          </div>
+        </div>
+
+        <div className="text-end">
+          <button className="btn btn-secondary" onClick={onClose}>Close</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AdminEvents() {
   const navigate = useNavigate();
   const [events, setEvents]       = useState(MOCK_EVENTS);
   const [loading, setLoading]     = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filtered, setFiltered]   = useState(MOCK_EVENTS);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   useEffect(() => {
     fetchEvents();
@@ -57,25 +114,17 @@ function AdminEvents() {
   async function fetchEvents() {
     setLoading(true);
     try {
-      // TODO (backend): fetch published events
-      // Maps to: GET /api/admin/events/published
-      // Expected shape: [{ id, title, date, venue, category, totalSlots, registeredCount, posterUrl, status }]
-      //
-      // const token = localStorage.getItem('token');
-      // const res = await fetch('http://127.0.0.1:8000/api/admin/events/published', {
-      //   headers: {
-      //     'Accept': 'application/json',
-      //     'Authorization': `Bearer ${token}`,
-      //   },
-      // });
-      // if (!res.ok) throw new Error('Failed to fetch events');
-      // const data = await res.json();
-      // setEvents(data);
-      // setFiltered(data);
-
-      // Remove once API is connected:
-      setEvents(MOCK_EVENTS);
-      setFiltered(MOCK_EVENTS);
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://127.0.0.1:8000/api/admin/events/published', {
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) throw new Error('Failed to fetch events');
+      const data = await res.json();
+      setEvents(data);
+      setFiltered(data);
     } catch (error) {
       console.error('Failed to fetch events:', error);
       setEvents(MOCK_EVENTS);
@@ -103,12 +152,16 @@ function AdminEvents() {
     );
   }
 
-  function handleViewEvent(eventId) {
-    navigate(`/admin/events/${eventId}/details`);
+  function handleViewEvent(event) {
+    setSelectedEvent(event);
   }
 
   return (
     <div className="admin-content">
+      <QuickViewModal 
+        event={selectedEvent} 
+        onClose={() => setSelectedEvent(null)} 
+      />
 
       {/* ── Header ──────────────────────────────────────────────────────── */}
       <div className="d-flex justify-content-between align-items-start mb-4">
@@ -154,7 +207,7 @@ function AdminEvents() {
             <div
               key={event.id}
               className="admin-event-card"
-              onClick={() => handleViewEvent(event.id)}
+              onClick={() => handleViewEvent(event)}
             >
               {/* Poster */}
               <div className="admin-event-card-poster">
