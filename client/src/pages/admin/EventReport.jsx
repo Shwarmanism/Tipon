@@ -144,7 +144,7 @@ function EventReport() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://127.0.0.1:8000/api/admin/report/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/report/${id}`, {
         headers: {
           'Accept': 'application/json',
           'Authorization': `Bearer ${token}`

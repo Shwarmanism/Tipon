@@ -85,7 +85,7 @@ function EvaluationForm() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://127.0.0.1:8000/api/user/event/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/event/${id}`, {
         headers: { 
           'Accept': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -121,7 +121,7 @@ function EvaluationForm() {
     setSubmitting(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://127.0.0.1:8000/api/user/feedback/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/feedback/${id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

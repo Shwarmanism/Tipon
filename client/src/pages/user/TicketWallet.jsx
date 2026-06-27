@@ -61,7 +61,7 @@ function TicketWallet() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://127.0.0.1:8000/api/user/tickets', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/tickets`, {
         headers: {
           'Accept': 'application/json',
           'Authorization': `Bearer ${token}`,
@@ -83,7 +83,7 @@ function TicketWallet() {
     if (!confirm('Are you sure you want to cancel your registration?')) return;
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://127.0.0.1:8000/api/user/cancel/${ticketId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/cancel/${ticketId}`, {
         method: 'POST',
         headers: {
           'Accept': 'application/json',

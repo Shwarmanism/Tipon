@@ -40,7 +40,7 @@ function UserProfile() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://127.0.0.1:8000/api/user/profile', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/profile`, {
         headers: { 
           'Accept': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -73,7 +73,7 @@ function UserProfile() {
     setSaveSuccess(false);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://127.0.0.1:8000/api/user/profile/update', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/profile/update`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -115,7 +115,7 @@ function UserProfile() {
     setChangingPassword(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://127.0.0.1:8000/api/user/profile/password', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/profile/password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

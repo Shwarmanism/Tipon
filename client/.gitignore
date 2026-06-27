@@ -26,3 +26,8 @@ dist-ssr
 # client
 client/node_modules
 client/dist
+
+# Environment variables
+.env
+.env.local
+.env.*.local

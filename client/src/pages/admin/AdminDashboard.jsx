@@ -71,7 +71,7 @@ function AdminDashboard() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://127.0.0.1:8000/api/admin/dashboard', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/dashboard`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Accept': 'application/json',
@@ -108,7 +108,7 @@ function AdminDashboard() {
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(
-        `http://127.0.0.1:8000/api/admin/event/delete/${eventToDelete.id}`,
+        `${import.meta.env.VITE_API_URL}/api/admin/event/delete/${eventToDelete.id}`,
         {
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${token}` },

@@ -44,7 +44,7 @@ function EditEvent() {
   async function fetchEvent() {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://127.0.0.1:8000/api/admin/event/edit/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/event/edit/${id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('Failed to fetch event');
@@ -60,7 +60,7 @@ function EditEvent() {
         endTime: data.event.end_time,
         totalSlots: String(data.event.total_slots),
         poster: null,
-        posterPreview: data.event.poster_path ? `http://127.0.0.1:8000/storage/${data.event.poster_path}` : '',
+        posterPreview: data.event.poster_path ? `${import.meta.env.VITE_API_URL}/storage/${data.event.poster_path}` : '',
       });
     } catch (error) {
       console.error('Failed to fetch event:', error);
@@ -131,7 +131,7 @@ function EditEvent() {
       if (form.poster) formData.append('poster', form.poster);
 
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://127.0.0.1:8000/api/admin/event/update/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/event/update/${id}`, {
         method: 'POST', // POST with _method: PUT for FormData
         headers: { 
           'Accept': 'application/json',

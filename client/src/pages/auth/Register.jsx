@@ -52,7 +52,7 @@ export default function Register() {
 
     setSubmitting(true);
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/register', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

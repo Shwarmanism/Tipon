@@ -71,7 +71,7 @@ function RegisteredEventDetails() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://127.0.0.1:8000/api/user/ticket/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/ticket/${id}`, {
         headers: { 
           'Accept': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -93,7 +93,7 @@ function RegisteredEventDetails() {
     setCancelling(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://127.0.0.1:8000/api/user/cancel/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/cancel/${id}`, {
         method: 'POST',
         headers: { 
           'Accept': 'application/json',

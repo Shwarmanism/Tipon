@@ -101,7 +101,7 @@ function CreateEvent() {
       if (form.poster) formData.append('poster', form.poster);
 
       const token = localStorage.getItem('token');
-      const res = await fetch('http://127.0.0.1:8000/api/admin/event/submit', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/event/submit`, {
         method: 'POST',
         headers: { 
           'Accept': 'application/json',

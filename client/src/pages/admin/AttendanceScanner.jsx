@@ -38,7 +38,7 @@ function AttendanceScanner() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://127.0.0.1:8000/api/admin/checkin/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/checkin/${id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('Failed to fetch event info');
@@ -88,7 +88,7 @@ function AttendanceScanner() {
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(
-        `http://127.0.0.1:8000/api/admin/checkin/manual`,
+        `${import.meta.env.VITE_API_URL}/api/admin/checkin/manual`,
         { 
           method: 'POST', 
           headers: { 
@@ -115,7 +115,7 @@ function AttendanceScanner() {
   async function handleQRScan(scannedData) {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://127.0.0.1:8000/api/admin/checkin/scan`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/checkin/scan`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json', 

@@ -20,7 +20,7 @@ function UserLayout() {
   async function handleLogout() {
     const token = localStorage.getItem('token');
     try {
-      await fetch('http://127.0.0.1:8000/api/logout', {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/logout`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

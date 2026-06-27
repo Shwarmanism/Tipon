@@ -56,7 +56,7 @@ function EventDetails() {
       const token = localStorage.getItem('token');
       
       // Fetch event details
-      const res = await fetch(`http://127.0.0.1:8000/api/user/event/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/event/${id}`, {
         headers: { 
           'Accept': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -67,7 +67,7 @@ function EventDetails() {
       setEvent(eventData);
 
       // Fetch user profile to pre-fill form
-      const profileRes = await fetch('http://127.0.0.1:8000/api/user/profile', {
+      const profileRes = await fetch(`${import.meta.env.VITE_API_URL}/api/user/profile`, {
         headers: { 
           'Accept': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -110,7 +110,7 @@ function EventDetails() {
     setSubmitting(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://127.0.0.1:8000/api/user/register/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/register/${id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

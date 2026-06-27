@@ -27,7 +27,7 @@ function AdminProfile() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://127.0.0.1:8000/api/admin/profile', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/profile`, {
         headers: {
           'Accept': 'application/json',
           'Authorization': `Bearer ${token}`,
@@ -60,7 +60,7 @@ function AdminProfile() {
     setSaveSuccess(false);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://127.0.0.1:8000/api/admin/profile/update', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/profile/update`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -99,7 +99,7 @@ function AdminProfile() {
     setChangingPassword(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://127.0.0.1:8000/api/admin/profile/password', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/profile/password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

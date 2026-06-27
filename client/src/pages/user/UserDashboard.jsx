@@ -105,7 +105,7 @@ function UserDashboard() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://127.0.0.1:8000/api/user/dashboard', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/dashboard`, {
         headers: {
           'Accept': 'application/json',
           'Authorization': `Bearer ${token}`,
@@ -129,7 +129,7 @@ function UserDashboard() {
   async function handleRegister(eventId) {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://127.0.0.1:8000/api/user/register/${eventId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/register/${eventId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
